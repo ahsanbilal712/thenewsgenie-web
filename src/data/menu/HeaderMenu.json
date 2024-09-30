@@ -1,0 +1,22 @@
+[
+    {
+        "label": "Economy",
+        "path": "/category/economy"
+    },
+    {
+        "label": "Politics",
+        "path": "/category/politics"
+    },
+    {
+        "label": "International Relations",
+        "path": "/category/international-relations"
+    },
+    {
+        "label": "Sports",
+        "path": "/category/sports"
+    },
+    {
+        "label": "Lifestyle",
+        "path": "/category/lifestyle"
+    }
+]
