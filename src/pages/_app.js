@@ -22,6 +22,7 @@ function MyApp({ Component, pageProps }) {
           name="google-site-verification"
           content="m2xs2KSR3ynGf6-R3l1pBfQ8lntpPJuQKGH-l5kgcyw"
         />
+        <link rel="canonical" href={`https://thenewsgenie.com${pageProps.canonicalPath || ''}`} />
       </Head>
 
       {/* Updated Google Analytics Script */}
