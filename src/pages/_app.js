@@ -42,13 +42,13 @@ function MyApp({ Component, pageProps }) {
       {/* Google AdSense Script */}
       <Script
         async
-        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5812499395538486"
+        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3840113030467128"
         strategy="afterInteractive"
         crossOrigin="anonymous"
       />
 
       {/* Render Google AdSense Component */}
-      <AdSense pid="ca-pub-5812499395538486" />
+      <AdSense pid="ca-pub-3840113030467128" />
 
       {/* Render the current page's component */}
       <Component {...pageProps} />

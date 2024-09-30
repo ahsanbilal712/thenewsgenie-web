@@ -6,7 +6,7 @@ const AdSense = ({ pId }) => {
   return (
     <Script
       async
-      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5812499395538486"
+      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3840113030467128"
       crossorigin="anonymous"
     />
   );

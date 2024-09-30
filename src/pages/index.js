@@ -71,12 +71,12 @@ function HomeTwo() {
   return (
     <html lang="en">
       <Head>
-        <AdSense pid="ca-pub-5812499395538486" />
+        <AdSense pid="ca-pub-3840113030467128" />
         <meta
           name="google-site-verification"
           content="m2xs2KSR3ynGf6-R3l1pBfQ8lntpPJuQKGH-l5kgcyw"
         />
-        <meta name="google-adsense-account" content="ca-pub-5812499395538486" />
+        <meta name="google-adsense-account" content="ca-pub-3840113030467128" />
       </Head>
 
       <HeadMeta metaTitle="Home" />
@@ -128,7 +128,7 @@ function HomeTwo() {
             <ins
               className="adsbygoogle"
               style={{ display: "block" }}
-              data-ad-client="ca-pub-5812499395538486"
+              data-ad-client="ca-pub-3840113030467128"
               data-ad-slot="your-ad-slot"
               data-ad-format="auto"
             ></ins>
