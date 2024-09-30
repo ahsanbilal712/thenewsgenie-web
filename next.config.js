@@ -35,7 +35,7 @@ const nextConfig = {
         has: [
           {
             type: 'host',
-            value: 'intellinews-web-main.vercel.app',
+            value: 'thenewsgenie-web.vercel.app',
           },
         ],
         destination: 'https://thenewsgenie.com/:path*',
