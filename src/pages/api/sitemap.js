@@ -18,7 +18,7 @@ export default async function handler(req, res) {
     const newsArticles = await db.collection("data_news")
       .find({})
       .sort({ publishedAt: -1 })
-      .limit(1000)
+      .limit(3000)
       .toArray();
 
     console.log(`Retrieved ${newsArticles.length} articles`);
