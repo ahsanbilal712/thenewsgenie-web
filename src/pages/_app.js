@@ -11,11 +11,11 @@ function MyApp({ Component, pageProps }) {
     <>
       {/* Use the Head component to manage the head section */}
       <Head>
-        <title>A News</title>
+        <title>The News Genie</title>
         <meta name="robots" content="index, follow" />
         <meta
           name="description"
-          content="A News - The latest updates in AI technology"
+          content="The News Genie - The Latest News"
         />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta
@@ -24,9 +24,9 @@ function MyApp({ Component, pageProps }) {
         />
       </Head>
 
-      {/* Google Analytics Script */}
+      {/* Updated Google Analytics Script */}
       <Script
-        src="https://www.googletagmanager.com/gtag/js?id=G-ZBLBZF7D7R"
+        src="https://www.googletagmanager.com/gtag/js?id=G-H0EG6GCSBM"
         strategy="afterInteractive"
       />
       <Script id="google-analytics" strategy="afterInteractive">
@@ -34,7 +34,7 @@ function MyApp({ Component, pageProps }) {
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
           gtag('js', new Date());
-          gtag('config', 'G-ZBLBZF7D7R');
+          gtag('config', 'G-H0EG6GCSBM');
         `}
       </Script>
 
