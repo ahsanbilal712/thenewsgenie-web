@@ -2,7 +2,7 @@ import Link from "next/link";
 import Offcanvas from "react-bootstrap/Offcanvas";
 import SocialLink from "../../data/social/SocialLink.json";
 
-const OffcanvasMenu = ({ ofcshow, ofcHandleClose }) => {
+const OffcanvasMenu = ({ ofcshow, ofcHandleClose, categories }) => {
   return (
     <Offcanvas
       show={ofcshow}
@@ -28,100 +28,62 @@ const OffcanvasMenu = ({ ofcshow, ofcHandleClose }) => {
                 <i className="fas fa-search" />
               </button>
             </div>
-            {/* End of .side-nav-search-form */}
           </form>
-          {/* End of .side-nav-search-form */}
+
           <div className="side-nav-content">
-            <div className="row ">
-              <div className="col-lg-6">
+            <div className="row">
+              <div className="col-lg-12">
                 <ul className="main-navigation side-navigation list-inline flex-column">
                   <li>
-                    <Link href="/category/fashion">
-                      <a>Fashion</a>
+                    <Link href="/">
+                      <a>Home</a>
                     </Link>
                   </li>
                   <li>
-                    <Link href="/category/lifestyle">
-                      <a>Lifestyle</a>
+                    <Link href="/latest">
+                      <a>Latest</a>
                     </Link>
                   </li>
-                  <li>
-                    <Link href="/category/technology">
-                      <a>Technology</a>
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/category/sports">
-                      <a>Sports</a>
-                    </Link>
-                  </li>
+                  {categories?.map((category, index) => (
+                    <li key={`category-${index}`}>
+                      <Link href={`/categories/${category}`}>
+                        <a>{category}</a>
+                      </Link>
+                    </li>
+                  ))}
                 </ul>
-                {/* End of .main-navigation */}
               </div>
-              {/* End of  .col-md-6 */}
-              <div className="col-lg-6">
-                <div className="axil-contact-info-inner">
-                  <h5 className="h5 m-b-xs-10">Contact Information</h5>
-                  <div className="axil-contact-info">
-                    <address className="address">
-                      <p className="m-b-xs-30  mid grey-dark-three ">
-                        Theodore Lowe, Ap #867-859
-                        <br />
-                        Sit Rd, Azusa New York
-                      </p>
-                      <div className="h5 m-b-xs-5">
-                        We&apos;re Available 24/ 7. Call Now.
-                      </div>
-                      <div>
-                        <a className="tel" href="tel:8884562790">
-                          <i className="fas fa-phone" />
-                          (888) 456-2790
-                        </a>
-                      </div>
-                      <div>
-                        <a className="tel" href="tel:12125553333">
-                          <i className="fas fa-fax" />
-                          (121) 255-53333
-                        </a>
-                      </div>
-                    </address>
-                    {/* End of address */}
-                    <div className="contact-social-share m-t-xs-30">
-                      <div className="axil-social-title h5">Follow Us</div>
-                      <ul className="social-share social-share__with-bg">
-                        <li>
-                          <a href={SocialLink.fb.url}>
-                            <i className={SocialLink.fb.icon} />
-                          </a>
-                        </li>
-                        <li>
-                          <a href={SocialLink.twitter.url}>
-                            <i className={SocialLink.twitter.icon} />
-                          </a>
-                        </li>
-                        <li>
-                          <a href={SocialLink.behance.url}>
-                            <i className={SocialLink.behance.icon} />
-                          </a>
-                        </li>
-                        <li>
-                          <a href={SocialLink.linked.url}>
-                            <i className={SocialLink.linked.icon} />
-                          </a>
-                        </li>
-                      </ul>
-                    </div>
-                    {/* End of .contact-shsdf */}
-                  </div>
-                  {/* End of .axil-contact-info */}
+              
+              <div className="col-lg-12 mt-5">
+                <div className="contact-social-share">
+                  <div className="axil-social-title h5">Follow Us</div>
+                  <ul className="social-share social-share__with-bg">
+                    <li>
+                      <a href={SocialLink.fb.url}>
+                        <i className={SocialLink.fb.icon} />
+                      </a>
+                    </li>
+                    <li>
+                      <a href={SocialLink.twitter.url}>
+                        <i className={SocialLink.twitter.icon} />
+                      </a>
+                    </li>
+                    <li>
+                      <a href={SocialLink.instagram.url}>
+                        <i className={SocialLink.instagram.icon} />
+                      </a>
+                    </li>
+                    <li>
+                      <a href={SocialLink.linked.url}>
+                        <i className={SocialLink.linked.icon} />
+                      </a>
+                    </li>
+                  </ul>
                 </div>
-                {/* End of .axil-contact-info-inner */}
               </div>
             </div>
-            {/* End of .row */}
           </div>
         </div>
-        {/* End of .side-nav-inner */}
       </div>
     </Offcanvas>
   );
