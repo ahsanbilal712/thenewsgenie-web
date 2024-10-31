@@ -22,41 +22,54 @@ function formatTimeAgo(createdAt) {
   }
 }
 
-const CategoriesGrid = ({ selectedCategories, newsData }) => {
-  const [filteredNews, setFilteredNews] = useState([]);
+const CategoriesGrid = ({ selectedCategories }) => {
+  const [categoriesNews, setCategoriesNews] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    // Load selected categories from local storage on component mount
+    // Load selected categories from local storage
     const savedCategories = JSON.parse(localStorage.getItem('selectedNewsCategories')) || [];
-    if (savedCategories.length > 0 && selectedCategories.length === 0) {
-      // Only use saved categories if no categories are currently selected
-      selectedCategories = savedCategories;
+    const categoriesToFetch = selectedCategories.length > 0 ? selectedCategories : savedCategories;
+    
+    if (categoriesToFetch.length > 0) {
+      fetchCategoriesNews(categoriesToFetch);
     }
+  }, [selectedCategories]);
 
-    const filtered = newsData.filter((item) =>
-      selectedCategories.includes(item.Category)
-    );
-    // Sort the filtered news by created_at date, latest first
-    const sortedFiltered = filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-    setFilteredNews(sortedFiltered);
-
-    // Save selected categories to local storage
-    localStorage.setItem('selectedNewsCategories', JSON.stringify(selectedCategories));
-  }, [selectedCategories, newsData]);
+  const fetchCategoriesNews = async (categories) => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(`/api/categories-news?categories=${JSON.stringify(categories)}`);
+      const data = await response.json();
+      
+      // Organize news by category
+      const newsByCategory = {};
+      categories.forEach(category => {
+        newsByCategory[category] = data.filter(
+          item => item.Category === category
+        ).sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+      });
+      setCategoriesNews(newsByCategory);
+    } catch (error) {
+      console.error('Error fetching categories news:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="container mx-auto py-8">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {selectedCategories.length === 0 ? (
-          <div>Please select a category to display news.</div>
+        {isLoading ? (
+          <div className="col-span-3 text-center">Loading news...</div>
+        ) : selectedCategories.length === 0 ? (
+          <div className="col-span-3 text-center">Please select a category to display news.</div>
         ) : (
           selectedCategories.map((category, index) => (
             <CategoryNews
               key={index}
               category={category}
-              news={filteredNews.filter(
-                (newsItem) => newsItem.Category === category
-              )}
+              news={categoriesNews[category] || []}
             />
           ))
         )}

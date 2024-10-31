@@ -53,9 +53,21 @@ export const getServerSideProps = async (context) => {
     const client = await connectToDatabase();
     const db = client.db("intelli-news-db");
     const decodedHeadline = decodeURIComponent(headline.replace(/-/g, ' '));
+    
+    // Only fetch required fields
     const news = await db
       .collection("data_news")
-      .findOne({ Headline: decodedHeadline });
+      .findOne(
+        { Headline: decodedHeadline },
+        { projection: { 
+          Headline: 1, 
+          Category: 1, 
+          Summary: 1, 
+          sources: 1,
+          image_url: 1,
+          created_at: 1 
+        }}
+      );
 
     if (!news) {
       return { notFound: true };

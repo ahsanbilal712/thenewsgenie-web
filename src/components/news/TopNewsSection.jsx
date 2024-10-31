@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useCallback, useEffect } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { FiSearch } from "react-icons/fi";
@@ -27,26 +27,37 @@ function formatTimeAgo(createdAt) {
 
 const TopNewsSection = ({ news }) => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
   const [isInputFocused, setIsInputFocused] = useState(false);
   const router = useRouter();
 
-  // Sort news items by the latest created_at date
-  const sortedNews = useMemo(() => {
-    return [...news].sort(
-      (a, b) => new Date(b.created_at) - new Date(a.created_at)
-    );
-  }, [news]);
+  // Debounce search function
+  const debouncedSearch = useCallback(
+    debounce(async (term) => {
+      if (term.length < 2) {
+        setSearchResults([]);
+        return;
+      }
 
-  const suggestedNews = useMemo(() => {
-    if (searchTerm.length > 0) {
-      return sortedNews.filter((item) =>
-        item.Headline && typeof item.Headline === 'string'
-          ? item.Headline.toLowerCase().includes(searchTerm.toLowerCase())
-          : false
-      ).slice(0, 5); // Limit to 5 suggestions
-    }
-    return [];
-  }, [searchTerm, sortedNews]);
+      setIsSearching(true);
+      try {
+        const response = await fetch(`/api/search?q=${encodeURIComponent(term)}`);
+        const data = await response.json();
+        setSearchResults(data);
+      } catch (error) {
+        console.error('Search error:', error);
+      } finally {
+        setIsSearching(false);
+      }
+    }, 300),
+    []
+  );
+
+  // Handle search input change
+  useEffect(() => {
+    debouncedSearch(searchTerm);
+  }, [searchTerm, debouncedSearch]);
 
   const handleNewsClick = (headline) => {
     const url = `/news/${encodeURIComponent(headline || '')}`;
@@ -64,28 +75,35 @@ const TopNewsSection = ({ news }) => {
                 <FiSearch className="text-gray-300 ml-6 mr-3" size={24} />
                 <input
                   type="text"
-                  placeholder="Search topics..."
+                  placeholder="Search news..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   onFocus={() => setIsInputFocused(true)}
                   onBlur={() => setTimeout(() => setIsInputFocused(false), 200)}
-                  className="w-full py-4 px-3 rounded-full focus:outline-none bg-transparent  text-white placeholder-gray-300"
+                  className="w-full py-4 px-3 rounded-full focus:outline-none bg-transparent text-white placeholder-gray-300"
                 />
+                {isSearching && (
+                  <div className="mr-4">
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
           
-          {/* Suggestions */}
-          {isInputFocused && suggestedNews.length > 0 && (
-            <div className="absolute z-10 bg-white bg-opacity-10 backdrop-blur-2xl rounded-2xl shadow-xl mt-2 w-full max-w-2xl left-1/2 transform -translate-x-1/2 overflow-hidden transition-all duration-300 ease-in-out">
-              {suggestedNews.map((item, index) => (
+          {/* Search Results */}
+          {isInputFocused && searchResults.length > 0 && (
+            <div className="absolute z-10 bg-white bg-opacity-10 backdrop-blur-2xl rounded-2xl shadow-xl mt-2 w-full max-w-2xl left-1/2 transform -translate-x-1/2 overflow-hidden">
+              {searchResults.map((item, index) => (
                 <div 
-                  key={item._id} 
-                  className={`p-4 hover:bg-white hover:bg-opacity-20 cursor-pointer transition-all duration-200 ${index !== suggestedNews.length - 1 ? 'border-b border-gray-200 border-opacity-20' : ''}`}
+                  key={item._id}
+                  className={`p-4 hover:bg-white hover:bg-opacity-20 cursor-pointer transition-all duration-200 ${
+                    index !== searchResults.length - 1 ? 'border-b border-gray-200 border-opacity-20' : ''
+                  }`}
                   onClick={() => handleNewsClick(item.Headline)}
                 >
                   <p className="text-white text-2xl font-semibold mb-1">{item.Headline}</p>
-                  <p className="text-gray-300 py text-sm">{item.Category} • {formatTimeAgo(item.created_at)}</p>
+                  <p className="text-gray-300 text-sm">{item.Category} • {formatTimeAgo(item.created_at)}</p>
                 </div>
               ))}
             </div>
@@ -102,7 +120,7 @@ const TopNewsSection = ({ news }) => {
         {/* Display news items */}
         <div className="flex flex-wrap">
           <div className="w-full lg:w-1/2 mb-8 mt-3 lg:mb-0">
-            {sortedNews.slice(0, 1).map((newsItem) => (
+            {news.slice(0, 1).map((newsItem) => (
               <div className="flex flex-col py-4" key={newsItem._id}>
                 <Link href={`/news/${encodeURIComponent(newsItem.Headline)}`}>
                   <a className="flex-shrink-0">
@@ -152,7 +170,7 @@ const TopNewsSection = ({ news }) => {
 
             <div className="axil-recent-news">
               <div className="axil-content">
-                {sortedNews.slice(1, 4).map((newsItem) => (
+                {news.slice(1, 4).map((newsItem) => (
                   <div className="flex flex-row p-4 lg:p-4" key={newsItem._id}>
                     <Link
                       href={`/news/${encodeURIComponent(newsItem.Headline)}`}
@@ -206,5 +224,18 @@ const TopNewsSection = ({ news }) => {
     </div>
   );
 };
+
+// Debounce utility function
+function debounce(func, wait) {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+}
 
 export default TopNewsSection;

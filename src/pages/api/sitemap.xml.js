@@ -1,4 +1,3 @@
-// src/pages/api/sitemap.js
 import { MongoClient } from "mongodb";
 import { SitemapStream, streamToPromise } from 'sitemap';
 import { Readable } from 'stream';
@@ -23,34 +22,37 @@ export default async function handler(req, res) {
       return res.send(sitemapCache.data);
     }
 
+    // Connect to MongoDB
     client = await MongoClient.connect(process.env.MONGODB_URI);
     const db = client.db("intelli-news-db");
 
-    // Create a readable stream for the sitemap
-    const smStream = new SitemapStream({ hostname: 'https://thenewsgenie.com' });
-    const pipeline = smStream.pipe(createGzip());
-
-    // Add static URLs
-    smStream.write({ url: '/', changefreq: 'always', priority: 1.0 });
-
-    // Stream news articles
-    const cursor = db.collection("data_news")
+    // Fetch all headlines and dates (minimal data)
+    const newsData = await db.collection("data_news")
       .find({})
-      .sort({ publishedAt: -1 })
-      .project({ Headline: 1, publishedAt: 1, updatedAt: 1 });
+      .project({ 
+        Headline: 1, 
+        created_at: 1, 
+        updated_at: 1 
+      })
+      .toArray();
 
-    // Process documents in batches
-    while (await cursor.hasNext()) {
-      const news = await cursor.next();
-      smStream.write({
+    // Create sitemap entries
+    const links = [
+      { url: '/', changefreq: 'always', priority: 1.0 },
+      ...newsData.map((news) => ({
         url: `/news/${encodeURIComponent(news.Headline)}`,
         changefreq: 'hourly',
         priority: 0.9,
-        lastmod: news.updatedAt || news.publishedAt
-      });
-    }
+        lastmod: news.updated_at || news.created_at || new Date().toISOString()
+      }))
+    ];
 
-    smStream.end();
+    // Create a readable stream of the links
+    const stream = new SitemapStream({ hostname: 'https://thenewsgenie.com' });
+    const pipeline = stream.pipe(createGzip());
+
+    // Write the links to the stream
+    Readable.from(links).pipe(stream);
 
     // Cache the generated sitemap
     const buffer = await streamToPromise(pipeline);
@@ -71,4 +73,4 @@ export default async function handler(req, res) {
       await client.close();
     }
   }
-}
+} 

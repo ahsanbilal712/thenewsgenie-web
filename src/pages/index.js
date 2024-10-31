@@ -33,7 +33,33 @@ function HomeTwo() {
     "Technology",
   ];
 
-  const { data, error } = useSWR(`/api/news`, fetcher);
+  const { data, error } = useSWR(`/api/news?page=1&limit=50`, fetcher);
+
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [allNews, setAllNews] = useState([]);
+
+  useEffect(() => {
+    if (data?.news) {
+      setAllNews(prev => [...prev, ...data.news]);
+      setHasMore(data.hasMore);
+    }
+  }, [data]);
+
+  const loadMore = async () => {
+    if (hasMore) {
+      const nextPage = page + 1;
+      const response = await fetch(`/api/news?page=${nextPage}&limit=50`);
+      const newData = await response.json();
+      if (newData.news.length > 0) {
+        setAllNews(prev => [...prev, ...newData.news]);
+        setPage(nextPage);
+        setHasMore(newData.hasMore);
+      } else {
+        setHasMore(false);
+      }
+    }
+  };
 
   // Load selected categories from localStorage on initial render
   useEffect(() => {
@@ -92,7 +118,7 @@ function HomeTwo() {
         )}
 
         <TopNewsSection
-          news={data}
+          news={allNews}
           category={category}
           setCategory={setCategory}
         />
@@ -143,11 +169,11 @@ function HomeTwo() {
 
           <CategoriesLatestSection
             selectedCategories={selectedCategories}
-            newsData={data}
+            newsData={allNews}
           />
           <NewsTopicsSection
             selectedCategories={selectedCategories}
-            newsData={data}
+            newsData={allNews}
           />
         </div>
 

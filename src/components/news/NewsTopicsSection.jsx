@@ -24,24 +24,50 @@ function formatTimeAgo(createdAt) {
   }
 }
 
-const NewsTopicsSection = ({ newsData }) => {
+const NewsTopicsSection = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [followedTopics, setFollowedTopics] = useState([]);
   const [isInputFocused, setIsInputFocused] = useState(false);
-  const router = useRouter();
+  const [topicsNews, setTopicsNews] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    // Load followed topics from local storage on component mount
+    // Load followed topics from local storage
     const savedTopics = JSON.parse(localStorage.getItem('followedTopics')) || [];
     setFollowedTopics(savedTopics);
+    if (savedTopics.length > 0) {
+      fetchTopicsNews(savedTopics);
+    }
   }, []);
 
-  const handleAddTopic = (topic) => {
+  const fetchTopicsNews = async (topics) => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(`/api/topics-news?topics=${JSON.stringify(topics)}`);
+      const data = await response.json();
+      
+      // Organize news by topic
+      const newsByTopic = {};
+      topics.forEach(topic => {
+        newsByTopic[topic] = data.filter(
+          item => item.Headline.toLowerCase().includes(topic.toLowerCase())
+        );
+      });
+      setTopicsNews(newsByTopic);
+    } catch (error) {
+      console.error('Error fetching topics news:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleAddTopic = async (topic) => {
     if (topic && !followedTopics.includes(topic)) {
       const updatedTopics = [...followedTopics, topic];
       setFollowedTopics(updatedTopics);
       localStorage.setItem('followedTopics', JSON.stringify(updatedTopics));
       setSearchTerm("");
+      await fetchTopicsNews(updatedTopics);
     }
   };
 
@@ -56,9 +82,6 @@ const NewsTopicsSection = ({ newsData }) => {
       handleAddTopic(searchTerm.trim());
     }
   };
-
-  // Sort news by latest first
-  const sortedNewsData = [...newsData].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
   return (
     <div className="container mx-auto py-8">
@@ -111,16 +134,18 @@ const NewsTopicsSection = ({ newsData }) => {
 
       {/* News Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {followedTopics.length === 0 ? (
-          <div className="text-center text-gray-500">Please add topics to display relevant news.</div>
+        {isLoading ? (
+          <div className="col-span-3 text-center">Loading news...</div>
+        ) : followedTopics.length === 0 ? (
+          <div className="col-span-3 text-center text-gray-500">
+            Please add topics to display relevant news.
+          </div>
         ) : (
           followedTopics.map((topic, index) => (
             <TopicNews
               key={index}
               topic={topic}
-              news={sortedNewsData.filter(
-                (newsItem) => newsItem.Headline && newsItem.Headline.toLowerCase().includes(topic.toLowerCase())
-              )}
+              news={topicsNews[topic] || []}
             />
           ))
         )}
