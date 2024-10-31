@@ -1,21 +1,22 @@
 // src/pages/categories/[category].js
 
+import { useState, useEffect } from "react";
 import { MongoClient } from "mongodb";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import HeadMeta from "../../components/elements/HeadMeta";
 import Breadcrumb from "../../components/common/Breadcrumb";
-
 import FooterOne from "../../components/footer/FooterOne";
 import HeaderTwo from "../../components/header/HeaderTwo";
+import Loading from "../../components/loading/Loading";
 
 const formatHeadlineForUrl = (headline) => {
   return encodeURIComponent(headline);
 };
 
-// Utility function to format the time ago
 function formatTimeAgo(createdAt) {
   const now = new Date();
-  const diff = Math.abs(now - new Date(createdAt)); // Difference in milliseconds
+  const diff = Math.abs(now - new Date(createdAt));
   const seconds = Math.floor(diff / 1000);
   const minutes = Math.floor(seconds / 60);
   const hours = Math.floor(minutes / 60);
@@ -24,9 +25,7 @@ function formatTimeAgo(createdAt) {
   if (seconds < 60) {
     return `Published Just Now`;
   } else if (minutes < 60) {
-    return `Published About ${minutes} ${
-      minutes === 1 ? "Minute" : "Minutes"
-    } Ago`;
+    return `Published About ${minutes} ${minutes === 1 ? "Minute" : "Minutes"} Ago`;
   } else if (hours < 24) {
     return `Published About ${hours} ${hours === 1 ? "Hour" : "Hours"} Ago`;
   } else {
@@ -34,28 +33,84 @@ function formatTimeAgo(createdAt) {
   }
 }
 
-const CategoryPage = ({ news }) => {
-  if (!news || news.length === 0) {
-    return <div>No news found for this category.</div>;
+const CategoryPage = ({ initialNews, category, totalCount }) => {
+  const router = useRouter();
+  const [news, setNews] = useState(initialNews);
+  const [isLoading, setIsLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(totalCount > initialNews.length);
+
+  useEffect(() => {
+    setNews(initialNews);
+    setPage(1);
+    setHasMore(totalCount > initialNews.length);
+    setIsLoading(false);
+  }, [category, initialNews, totalCount]);
+
+  const loadMore = async () => {
+    if (isLoading) return;
+
+    setIsLoading(true);
+    const nextPage = page + 1;
+
+    try {
+      const response = await fetch(`/api/category-news?category=${category}&page=${nextPage}&limit=40`);
+      const data = await response.json();
+
+      if (data.news.length > 0) {
+        setNews(prevNews => [...prevNews, ...data.news]);
+        setPage(nextPage);
+        setHasMore(data.hasMore);
+      } else {
+        setHasMore(false);
+      }
+    } catch (error) {
+      console.error('Error loading more news:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (router.isFallback || (isLoading && news.length === 0)) {
+    return (
+      <>
+        <HeadMeta metaTitle="Loading..." />
+        <HeaderTwo />
+        <div className="container">
+          <Loading />
+        </div>
+        <FooterOne />
+      </>
+    );
   }
 
-  // Sort the news array by created_at date in descending order
-  const sortedNews = [...news].sort(
-    (a, b) => new Date(b.created_at) - new Date(a.created_at)
-  );
+  if (!news || news.length === 0) {
+    return (
+      <>
+        <HeadMeta metaTitle={`No News Found - ${category}`} />
+        <HeaderTwo />
+        <div className="container">
+          <div className="text-center py-20">
+            <h2 className="text-2xl font-bold">No news found for {category}</h2>
+          </div>
+        </div>
+        <FooterOne />
+      </>
+    );
+  }
 
   return (
     <>
-      <HeadMeta metaTitle={`News Category: ${sortedNews[0].Category}`} />
+      <HeadMeta metaTitle={`News Category: ${category}`} />
       <HeaderTwo />
-      <Breadcrumb aPage={sortedNews[0].Category} />
+      <Breadcrumb aPage={category} />
 
       <div className="container">
-        <h1 className="category-title mt-5">
-          Category: {sortedNews[0].Category}
+        <h1 className="category-title mt-5 text-center text-4xl font-bold">
+          Category: {category}
         </h1>
         <div className="col mt-5 mb-5">
-          {sortedNews.map((item) => (
+          {news.map((item) => (
             <div
               className="col-lg-4 col-md-6 w-full md:w-[600px] lg:w-[800px] xl:w-[1200px]"
               key={item._id}
@@ -63,12 +118,9 @@ const CategoryPage = ({ news }) => {
               <div className="flex flex-col md:flex-row p-4 mt-[30px]">
                 <Link href={`/news/${formatHeadlineForUrl(item.Headline)}`}>
                   <a className="align-self-center">
-                    <div className=" w-[400px] h-[200px] lg:w-[210px] lg:h-[170px] overflow-hidden group">
+                    <div className="w-[400px] h-[200px] lg:w-[210px] lg:h-[170px] overflow-hidden group">
                       <img
-                        src={
-                          item.image_url ||
-                          "/images/news-images/news_background.jpg"
-                        }
+                        src={item.image_url || "/images/news-images/news_background.jpg"}
                         alt={item.Headline}
                         className="w-full h-full object-cover rounded-lg transition-transform duration-300 ease-in-out transform group-hover:scale-105"
                       />
@@ -84,10 +136,8 @@ const CategoryPage = ({ news }) => {
                       </a>
                     </Link>
                   </div>
-                  <div
-                    className="text-3xl md:text-2xl lg:text-3xl xl:text-5xl hover-line md:-mt-4 lg:-mt-8 font-bold"
-                    style={{ lineHeight: "1.3" }}
-                  >
+                  <div className="text-3xl md:text-2xl lg:text-3xl xl:text-5xl hover-line md:-mt-4 lg:-mt-8 font-bold"
+                    style={{ lineHeight: "1.3" }}>
                     <Link href={`/news/${formatHeadlineForUrl(item.Headline)}`}>
                       <a>{item.Headline}</a>
                     </Link>
@@ -100,6 +150,27 @@ const CategoryPage = ({ news }) => {
             </div>
           ))}
         </div>
+
+        {/* Load More Button */}
+        {hasMore && (
+          <div className="flex justify-center my-8">
+            <button
+              onClick={loadMore}
+              disabled={isLoading}
+              className={`px-6 py-3 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 transition-colors
+                ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+            >
+              {isLoading ? (
+                <div className="flex items-center">
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                  Loading...
+                </div>
+              ) : (
+                'Load More'
+              )}
+            </button>
+          </div>
+        )}
       </div>
       <FooterOne />
     </>
@@ -108,26 +179,45 @@ const CategoryPage = ({ news }) => {
 
 export const getServerSideProps = async (context) => {
   const { category } = context.params;
+  let client;
 
-  const client = await MongoClient.connect(process.env.MONGODB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
-  const db = client.db("intelli-news-db");
+  try {
+    client = await MongoClient.connect(process.env.MONGODB_URI);
+    const db = client.db("intelli-news-db");
 
-  // Retrieve news sorted by created_at date in descending order directly from the database
-  const news = await db
-    .collection("data_news")
-    .find({ Category: category })
-    .sort({ created_at: -1 }) // Sorting by created_at in descending order
-    .toArray();
-  client.close();
+    // Get initial batch of news and total count
+    const [news, totalCount] = await Promise.all([
+      db.collection("data_news")
+        .find({ Category: category })
+        .sort({ created_at: -1 })
+        .limit(40)
+        .toArray(),
+      db.collection("data_news")
+        .countDocuments({ Category: category })
+    ]);
 
-  return {
-    props: {
-      news: news.map((document) => JSON.parse(JSON.stringify(document))),
-    },
-  };
+    return {
+      props: {
+        initialNews: JSON.parse(JSON.stringify(news)),
+        category,
+        totalCount
+      },
+    };
+  } catch (error) {
+    console.error('Error fetching category news:', error);
+    return {
+      props: {
+        initialNews: [],
+        category,
+        totalCount: 0,
+        error: 'Failed to fetch news'
+      }
+    };
+  } finally {
+    if (client) {
+      await client.close();
+    }
+  }
 };
 
 export default CategoryPage;

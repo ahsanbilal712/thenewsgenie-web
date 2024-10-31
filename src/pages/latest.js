@@ -3,49 +3,120 @@ import HeadMeta from "../components/elements/HeadMeta";
 import FooterOne from "../components/footer/FooterOne";
 import HeaderTwo from "../components/header/HeaderTwo";
 import Breadcrumb from "../components/common/Breadcrumb";
-
 import HomeNews from "../components/news/HomeNews";
-import useSWR from "swr";
-import { useRouter } from "next/router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Loading from "../components/loading/Loading";
 
-const fetcher = (url) => fetch(url).then((res) => res.json());
-
 function LatestNews() {
-  const router = useRouter();
-  const [category, setCategory] = useState("");
-  const { data, error } = useSWR(`/api/news?category=${category}`, fetcher);
+  const [news, setNews] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
-  if (error) return <div>Failed to load data.</div>;
-  if (!data) return <Loading />;
+  // Fetch news data
+  const fetchNews = async (pageNum = 1, isLoadMore = false) => {
+    try {
+      if (isLoadMore) {
+        setIsLoadingMore(true);
+      } else {
+        setIsLoading(true);
+      }
 
-  // Log data to check its structure
-  console.log("Data fetched from API:", data);
+      const response = await fetch(`/api/news?page=${pageNum}&limit=40`);
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch news');
+      }
 
-  const handleCategoryChange = (e) => {
-    const selectedCategory = e.target.value;
-    setCategory(selectedCategory);
-    if (selectedCategory) {
-      router.push(`/categories/${selectedCategory}`);
+      const data = await response.json();
+      
+      if (pageNum === 1) {
+        setNews(data.news || []);
+      } else {
+        setNews(prev => [...prev, ...(data.news || [])]);
+      }
+      
+      setHasMore(data.hasMore);
+      setError(null);
+    } catch (err) {
+      console.error('Error fetching news:', err);
+      setError('Failed to load news');
+    } finally {
+      setIsLoading(false);
+      setIsLoadingMore(false);
     }
   };
 
+  // Initial fetch
+  useEffect(() => {
+    fetchNews(1);
+  }, []);
+
+  // Load more handler
+  const handleLoadMore = async () => {
+    if (!isLoadingMore && hasMore) {
+      const nextPage = page + 1;
+      setPage(nextPage);
+      await fetchNews(nextPage, true);
+    }
+  };
+
+  if (error) {
+    return (
+      <>
+        <HeadMeta metaTitle="Latest News - Error" />
+        <HeaderTwo />
+        <div className="flex justify-center items-center h-[50vh]">
+          <div className="text-red-500 text-xl">{error}</div>
+        </div>
+        <FooterOne />
+      </>
+    );
+  }
+
   return (
     <>
-      <HeadMeta metaTitle="LatestNews" />
-
+      <HeadMeta metaTitle="Latest News" />
       <HeaderTwo />
       <Breadcrumb aPage="Latest" />
 
-      <div className="flex justify-center text-5xl py-10 font-bold">
-        Latest News
+      <div className="container mx-auto px-4">
+        <div className="flex justify-center text-5xl py-10 font-bold">
+          Latest News
+        </div>
+
+        {isLoading && news.length === 0 ? (
+          <Loading />
+        ) : (
+          <>
+            <HomeNews news={news} />
+            
+            {/* Load More Button */}
+            {hasMore && (
+              <div className="flex justify-center my-8">
+                <button
+                  onClick={handleLoadMore}
+                  disabled={isLoadingMore}
+                  className={`px-6 py-3 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 transition-colors
+                    ${isLoadingMore ? 'opacity-50 cursor-not-allowed' : ''}`}
+                >
+                  {isLoadingMore ? (
+                    <div className="flex items-center">
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                      Loading...
+                    </div>
+                  ) : (
+                    'Load More'
+                  )}
+                </button>
+              </div>
+            )}
+          </>
+        )}
       </div>
-      <HomeNews
-        news={Array.isArray(data) ? data : []}
-        category={category}
-        setCategory={setCategory}
-      />
+
       <FooterOne />
     </>
   );
