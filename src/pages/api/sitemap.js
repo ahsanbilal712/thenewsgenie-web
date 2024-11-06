@@ -5,14 +5,14 @@ import { Readable } from 'stream';
 import { createGzip } from 'zlib';
 import { formatHeadlineForUrl } from '../../utils/urlHelpers';
 
-// Cache configuration
-const CACHE_DURATION = 3600000; // 1 hour
+// Increase cache duration to reduce database calls
+const CACHE_DURATION = 21600000; // 6 hours
 let sitemapCache = {
   data: null,
   lastGenerated: null
 };
 
-// Define all categories with their priorities
+// Categories configuration
 const CATEGORIES = {
   "Pakistan": 0.9,
   "World": 0.9,
@@ -25,55 +25,58 @@ const CATEGORIES = {
   "Technology": 0.9
 };
 
-// Validate and sanitize news data
-const sanitizeNewsData = (news) => {
-  return {
-    Headline: news.Headline || '',
-    Category: news.Category || 'Uncategorized',
-    created_at: news.created_at || new Date(),
-    updated_at: news.updated_at || news.created_at || new Date(),
-    image_url: news.image_url || '',
-    Summary: news.Summary || ''
-  };
+// Generate keywords from headline
+const generateKeywords = (news) => {
+  const baseKeywords = [news.Category.toLowerCase(), "news"];
+  const headlineWords = news.Headline.toLowerCase()
+    .split(' ')
+    .filter(word => word.length > 3)
+    .slice(0, 8); // Take first 5 significant words
+  return [...baseKeywords, ...headlineWords].join(', ');
 };
 
 export default async function handler(req, res) {
   let client;
 
   try {
-    // Check cache
+    // Check cache first
     if (sitemapCache.data && 
         (Date.now() - sitemapCache.lastGenerated) < CACHE_DURATION) {
       res.setHeader('Content-Type', 'application/xml');
       res.setHeader('Content-Encoding', 'gzip');
-      res.setHeader('Cache-Control', 'public, max-age=3600');
+      res.setHeader('Cache-Control', 'public, max-age=21600');
       return res.send(sitemapCache.data);
     }
 
-    // Connect to MongoDB
-    client = await MongoClient.connect(process.env.MONGODB_URI);
+    // Connect to MongoDB with timeout
+    client = await MongoClient.connect(process.env.MONGODB_URI, {
+      serverSelectionTimeoutMS: 5000,
+      maxPoolSize: 10
+    });
+    
     const db = client.db("intelli-news-db");
 
-    // Fetch all headlines and dates
-    const rawNewsData = await db.collection("data_news")
-      .find({})
+    // Fetch only recent news (last 30 days) to reduce data size
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    const newsData = await db.collection("data_news")
+      .find({
+        created_at: { $gte: thirtyDaysAgo }
+      })
       .project({ 
         Headline: 1, 
         Category: 1,
         created_at: 1, 
         updated_at: 1,
-        image_url: 1,
-        Summary: 1
+        image_url: 1
       })
       .sort({ created_at: -1 })
+      .limit(1000) // Limit to most recent 1000 articles
       .toArray();
 
-    // Sanitize news data
-    const newsData = rawNewsData.map(sanitizeNewsData);
-
-    // Create sitemap entries
+    // Create base links array with static pages
     const links = [
-      // Static pages
       { 
         url: '/', 
         changefreq: 'always', 
@@ -86,50 +89,45 @@ export default async function handler(req, res) {
         priority: 0.9,
         lastmod: new Date().toISOString()
       },
-
-      // Category pages
+      // Add category pages
       ...Object.keys(CATEGORIES).map(category => ({
         url: `/categories/${category.toLowerCase()}`,
-        changefreq: 'hourly',
+        changefreq: 'daily',
         priority: CATEGORIES[category],
         lastmod: new Date().toISOString()
-      })),
-
-      // News pages with proper URL formatting and validation
-      ...newsData.map((news) => {
-        const formattedUrl = formatHeadlineForUrl(news.Headline);
-        if (!formattedUrl) return null; // Skip invalid URLs
-
-        return {
-          url: `/news/${formattedUrl}`,
-          changefreq: 'hourly',
-          priority: 0.8,
-          lastmod: new Date(news.updated_at || news.created_at).toISOString(),
-          img: news.image_url ? [
-            {
-              url: news.image_url,
-              caption: news.Headline,
-              title: news.Headline
-            }
-          ] : undefined,
-          news: {
-            publication: {
-              name: "The News Genie",
-              language: "en"
-            },
-            publication_date: new Date(news.created_at).toISOString(),
-            title: news.Headline,
-            keywords: `${news.Category.toLowerCase()}, news, ${news.Headline.split(' ')
-              .filter(word => word && word.length > 3)
-              .slice(0, 5)
-              .join(', ')
-              .toLowerCase()}`
-          }
-        };
-      }).filter(Boolean) // Remove null entries
+      }))
     ];
 
-    // Create sitemap stream with extended options
+    // Add news pages with original keyword logic
+    const newsLinks = newsData.map(news => {
+      const formattedUrl = formatHeadlineForUrl(news.Headline);
+      if (!formattedUrl) return null;
+
+      return {
+        url: `/news/${formattedUrl}`,
+        changefreq: 'daily',
+        priority: 0.8,
+        lastmod: new Date(news.updated_at || news.created_at).toISOString(),
+        img: news.image_url ? [{
+          url: news.image_url,
+          caption: news.Headline,
+          title: news.Headline
+        }] : undefined,
+        news: {
+          publication: {
+            name: "The News Genie",
+            language: "en"
+          },
+          publication_date: new Date(news.created_at).toISOString(),
+          title: news.Headline,
+          keywords: generateKeywords(news)
+        }
+      };
+    }).filter(Boolean);
+
+    links.push(...newsLinks);
+
+    // Generate sitemap
     const stream = new SitemapStream({ 
       hostname: 'https://thenewsgenie.com',
       lastmodDateOnly: false,
@@ -142,28 +140,31 @@ export default async function handler(req, res) {
 
     const pipeline = stream.pipe(createGzip());
 
-    // Write the links to the stream
+    // Write links and handle errors
     Readable.from(links).pipe(stream);
 
-    // Cache the generated sitemap
     const buffer = await streamToPromise(pipeline);
     sitemapCache.data = buffer;
     sitemapCache.lastGenerated = Date.now();
 
-    // Send response with proper headers
     res.setHeader('Content-Type', 'application/xml');
     res.setHeader('Content-Encoding', 'gzip');
-    res.setHeader('Cache-Control', 'public, max-age=3600');
+    res.setHeader('Cache-Control', 'public, max-age=21600');
     res.setHeader('Last-Modified', new Date(sitemapCache.lastGenerated).toUTCString());
     res.send(buffer);
 
   } catch (error) {
     console.error("Error generating sitemap:", error);
-    res.status(500).json({ 
-      error: "Error generating sitemap", 
-      details: error.message,
-      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
-    });
+    
+    // Return cached version if available, even if expired
+    if (sitemapCache.data) {
+      res.setHeader('Content-Type', 'application/xml');
+      res.setHeader('Content-Encoding', 'gzip');
+      res.setHeader('Cache-Control', 'public, max-age=3600');
+      return res.send(sitemapCache.data);
+    }
+
+    res.status(500).json({ error: "Error generating sitemap" });
   } finally {
     if (client) {
       await client.close();

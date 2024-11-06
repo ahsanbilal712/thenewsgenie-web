@@ -74,10 +74,12 @@ const NewsLayout = ({ news }) => {
         <title>{news.Headline} | The News Genie</title>
         <meta name="description" content={truncateSummary(news.Summary)} />
         
-        {/* Open Graph Meta Tags for Social Media */}
+        {/* WhatsApp Preview Meta Tags */}
         <meta property="og:title" content={news.Headline} />
         <meta property="og:description" content={truncateSummary(news.Summary)} />
         <meta property="og:image" content={news.image_url} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
         <meta property="og:type" content="article" />
         <meta property="og:url" content={fullUrl} />
         <meta property="og:site_name" content="The News Genie" />
@@ -85,18 +87,71 @@ const NewsLayout = ({ news }) => {
         {/* Twitter Card Meta Tags */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:site" content="@TheNewsGenie" />
+        <meta name="twitter:creator" content="@TheNewsGenie" />
         <meta name="twitter:title" content={news.Headline} />
         <meta name="twitter:description" content={truncateSummary(news.Summary)} />
         <meta name="twitter:image" content={news.image_url} />
+        <meta name="twitter:image:alt" content={news.Headline} />
 
         {/* Article Specific Meta Tags */}
         <meta property="article:published_time" content={publishedDate} />
+        <meta property="article:modified_time" content={publishedDate} />
         <meta property="article:section" content={news.Category} />
+        <meta property="article:tag" content={news.Category} />
         
-        {/* Structured Data */}
+        {/* Image Optimization for Google Images */}
+        <meta property="og:image:type" content="image/jpeg" />
+        <meta name="robots" content="max-image-preview:large" />
+        <link rel="image_src" href={news.image_url} />
+        
+        {/* Google Search Optimization */}
+        <meta name="googlebot" content="max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+        <meta name="description" content={truncateSummary(news.Summary)} />
+        <link rel="canonical" href={fullUrl} />
+
+        {/* Structured Data for Google Search */}
         <script 
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+          dangerouslySetInnerHTML={{ 
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "NewsArticle",
+              "headline": news.Headline,
+              "image": [
+                {
+                  "@type": "ImageObject",
+                  "url": news.image_url,
+                  "width": 1200,
+                  "height": 630,
+                  "caption": news.Headline
+                }
+              ],
+              "datePublished": publishedDate,
+              "dateModified": publishedDate,
+              "author": [{
+                "@type": "Organization",
+                "name": "The News Genie",
+                "url": baseUrl
+              }],
+              "publisher": {
+                "@type": "Organization",
+                "name": "The News Genie",
+                "logo": {
+                  "@type": "ImageObject",
+                  "url": `${baseUrl}/images/logo-intellinews.jpeg`,
+                  "width": 600,
+                  "height": 60
+                }
+              },
+              "description": truncateSummary(news.Summary),
+              "mainEntityOfPage": {
+                "@type": "WebPage",
+                "@id": fullUrl
+              },
+              "articleBody": news.Summary,
+              "keywords": generateKeywords(news)
+            })
+          }}
         />
 
         {/* Additional SEO tags */}
@@ -108,7 +163,7 @@ const NewsLayout = ({ news }) => {
         <meta property="og:locale" content="en_US" />
         <meta property="og:updated_time" content={publishedDate} />
         
-        {/* Additional Schema.org markup */}
+        {/* Breadcrumb Schema */}
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
@@ -145,13 +200,18 @@ const NewsLayout = ({ news }) => {
             <img
               src={news.image_url}
               alt={news.Headline}
-              className=""
+              title={news.Headline}
+              loading="eager"
+              width="1200"
+              height="630"
+              className="news-image"
               style={{
                 borderRadius: "20px",
                 padding: "1rem",
                 display: "block",
                 margin: "0 auto",
               }}
+              itemProp="image"
             />
             <div className="mx-auto font-bold">
               Image Credits: {news.Image_source_name}
