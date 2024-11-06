@@ -25,6 +25,18 @@ const CATEGORIES = {
   "Technology": 0.9
 };
 
+// Validate and sanitize news data
+const sanitizeNewsData = (news) => {
+  return {
+    Headline: news.Headline || '',
+    Category: news.Category || 'Uncategorized',
+    created_at: news.created_at || new Date(),
+    updated_at: news.updated_at || news.created_at || new Date(),
+    image_url: news.image_url || '',
+    Summary: news.Summary || ''
+  };
+};
+
 export default async function handler(req, res) {
   let client;
 
@@ -43,7 +55,7 @@ export default async function handler(req, res) {
     const db = client.db("intelli-news-db");
 
     // Fetch all headlines and dates
-    const newsData = await db.collection("data_news")
+    const rawNewsData = await db.collection("data_news")
       .find({})
       .project({ 
         Headline: 1, 
@@ -55,6 +67,9 @@ export default async function handler(req, res) {
       })
       .sort({ created_at: -1 })
       .toArray();
+
+    // Sanitize news data
+    const newsData = rawNewsData.map(sanitizeNewsData);
 
     // Create sitemap entries
     const links = [
@@ -80,29 +95,38 @@ export default async function handler(req, res) {
         lastmod: new Date().toISOString()
       })),
 
-      // News pages with proper URL formatting
-      ...newsData.map((news) => ({
-        url: `/news/${formatHeadlineForUrl(news.Headline)}`,
-        changefreq: 'hourly',
-        priority: 0.8,
-        lastmod: news.updated_at || news.created_at || new Date().toISOString(),
-        img: news.image_url ? [
-          {
-            url: news.image_url,
-            caption: news.Headline,
-            title: news.Headline
+      // News pages with proper URL formatting and validation
+      ...newsData.map((news) => {
+        const formattedUrl = formatHeadlineForUrl(news.Headline);
+        if (!formattedUrl) return null; // Skip invalid URLs
+
+        return {
+          url: `/news/${formattedUrl}`,
+          changefreq: 'hourly',
+          priority: 0.8,
+          lastmod: new Date(news.updated_at || news.created_at).toISOString(),
+          img: news.image_url ? [
+            {
+              url: news.image_url,
+              caption: news.Headline,
+              title: news.Headline
+            }
+          ] : undefined,
+          news: {
+            publication: {
+              name: "The News Genie",
+              language: "en"
+            },
+            publication_date: new Date(news.created_at).toISOString(),
+            title: news.Headline,
+            keywords: `${news.Category.toLowerCase()}, news, ${news.Headline.split(' ')
+              .filter(word => word && word.length > 3)
+              .slice(0, 5)
+              .join(', ')
+              .toLowerCase()}`
           }
-        ] : undefined,
-        news: {
-          publication: {
-            name: "The News Genie",
-            language: "en"
-          },
-          publication_date: new Date(news.created_at).toISOString(),
-          title: news.Headline,
-          keywords: `${news.Category.toLowerCase()}, news, ${news.Headline.split(' ').slice(0, 5).join(', ').toLowerCase()}`
-        }
-      }))
+        };
+      }).filter(Boolean) // Remove null entries
     ];
 
     // Create sitemap stream with extended options
@@ -137,7 +161,8 @@ export default async function handler(req, res) {
     console.error("Error generating sitemap:", error);
     res.status(500).json({ 
       error: "Error generating sitemap", 
-      details: error.message 
+      details: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
     });
   } finally {
     if (client) {
