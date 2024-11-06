@@ -23,44 +23,61 @@ export default async function handler(req, res) {
       return res.send(sitemapCache.data);
     }
 
+    // Connect to MongoDB
     client = await MongoClient.connect(process.env.MONGODB_URI);
     const db = client.db("intelli-news-db");
 
-    // Create a readable stream for the sitemap
-    const smStream = new SitemapStream({ hostname: 'https://thenewsgenie.com' });
-    const pipeline = smStream.pipe(createGzip());
-
-    // Add static URLs
-    smStream.write({ url: '/', changefreq: 'always', priority: 1.0 });
-
-    // Stream news articles
-    const cursor = db.collection("data_news")
+    // Fetch all headlines and dates (minimal data)
+    const newsData = await db.collection("data_news")
       .find({})
-      .sort({ publishedAt: -1 })
-      .project({ Headline: 1, publishedAt: 1, updatedAt: 1 });
+      .project({ 
+        Headline: 1, 
+        Category: 1,
+        created_at: 1, 
+        updated_at: 1 
+      })
+      .toArray();
 
-    // Process documents in batches
-    while (await cursor.hasNext()) {
-      const news = await cursor.next();
-      smStream.write({
+    // Create sitemap entries
+    const links = [
+      { url: '/', changefreq: 'always', priority: 1.0 },
+      { url: '/latest', changefreq: 'hourly', priority: 0.9 },
+      // Add category pages
+      ...Array.from(new Set(newsData.map(news => news.Category)))
+        .map(category => ({
+          url: `/categories/${encodeURIComponent(category)}`,
+          changefreq: 'hourly',
+          priority: 0.8
+        })),
+      // Add news pages
+      ...newsData.map((news) => ({
         url: `/news/${encodeURIComponent(news.Headline)}`,
         changefreq: 'hourly',
-        priority: 0.9,
-        lastmod: news.updatedAt || news.publishedAt
-      });
-    }
+        priority: 0.7,
+        lastmod: news.updated_at || news.created_at || new Date().toISOString()
+      }))
+    ];
 
-    smStream.end();
+    // Create a readable stream of the links
+    const stream = new SitemapStream({ 
+      hostname: 'https://thenewsgenie.com',
+      lastmodDateOnly: true // More efficient date format
+    });
+    const pipeline = stream.pipe(createGzip());
+
+    // Write the links to the stream
+    Readable.from(links).pipe(stream);
 
     // Cache the generated sitemap
     const buffer = await streamToPromise(pipeline);
     sitemapCache.data = buffer;
     sitemapCache.lastGenerated = Date.now();
 
-    // Send response
+    // Send response with proper headers
     res.setHeader('Content-Type', 'application/xml');
     res.setHeader('Content-Encoding', 'gzip');
     res.setHeader('Cache-Control', 'public, max-age=3600');
+    res.setHeader('Last-Modified', new Date(sitemapCache.lastGenerated).toUTCString());
     res.send(buffer);
 
   } catch (error) {
