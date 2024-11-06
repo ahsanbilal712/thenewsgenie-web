@@ -2,46 +2,58 @@
 import React from "react";
 import Link from "next/link";
 import Head from "next/head";
+import { useRouter } from 'next/router';
 import SourcesLayout from "./SourcesLayout";
 import FeedbackLayout from "./FeedbackLayout";
 import Breadcrumb from "../../common/Breadcrumb";
+import { formatHeadlineForUrl } from '../../../utils/urlHelpers';
 
 const NewsLayout = ({ news }) => {
-  if (!news)
-    return (
-      <div className="news-not-found text-center py-10">No news found.</div>
-    );
+  const router = useRouter();
+  
+  if (!news) return (
+    <div className="news-not-found text-center py-10">No news found.</div>
+  );
 
+  const baseUrl = "https://thenewsgenie.com";
+  const currentUrl = `/news/${formatHeadlineForUrl(news.Headline)}`;
+  const fullUrl = `${baseUrl}${currentUrl}`;
+  
   // Format the date for structured data
   const publishedDate = new Date(news.created_at).toISOString();
+
+  // Truncate summary for meta description
+  const truncateSummary = (text, maxLength = 160) => {
+    if (!text) return '';
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength).trim() + '...';
+  };
 
   // Create structured data for Google
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "NewsArticle",
     "headline": news.Headline,
-    "image": [
-      news.image_url
-    ],
+    "image": [news.image_url],
     "datePublished": publishedDate,
     "dateModified": publishedDate,
     "author": [{
       "@type": "Organization",
       "name": "The News Genie",
-      "url": "https://thenewsgenie.com"
+      "url": baseUrl
     }],
     "publisher": {
       "@type": "Organization",
       "name": "The News Genie",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://thenewsgenie.com/images/logo-intellinews.jpeg"
+        "url": `${baseUrl}/images/logo-intellinews.jpeg`
       }
     },
     "description": news.Summary,
     "mainEntityOfPage": {
       "@type": "WebPage",
-      "@id": `https://thenewsgenie.com/news/${encodeURIComponent(news.Headline)}`
+      "@id": fullUrl
     }
   };
 
@@ -50,21 +62,21 @@ const NewsLayout = ({ news }) => {
       <Head>
         {/* Basic Meta Tags */}
         <title>{news.Headline} | The News Genie</title>
-        <meta name="description" content={news.Summary} />
+        <meta name="description" content={truncateSummary(news.Summary)} />
         
         {/* Open Graph Meta Tags for Social Media */}
         <meta property="og:title" content={news.Headline} />
-        <meta property="og:description" content={news.Summary} />
+        <meta property="og:description" content={truncateSummary(news.Summary)} />
         <meta property="og:image" content={news.image_url} />
         <meta property="og:type" content="article" />
-        <meta property="og:url" content={`https://thenewsgenie.com/news/${encodeURIComponent(news.Headline)}`} />
+        <meta property="og:url" content={fullUrl} />
         <meta property="og:site_name" content="The News Genie" />
 
         {/* Twitter Card Meta Tags */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:site" content="@TheNewsGenie" />
         <meta name="twitter:title" content={news.Headline} />
-        <meta name="twitter:description" content={news.Summary} />
+        <meta name="twitter:description" content={truncateSummary(news.Summary)} />
         <meta name="twitter:image" content={news.image_url} />
 
         {/* Article Specific Meta Tags */}

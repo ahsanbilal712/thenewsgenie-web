@@ -1,9 +1,24 @@
 import Head from "next/head";
+import { useRouter } from 'next/router';
 
-const HeadMeta = ({ metaTitle, metaDescription }) => {
+const HeadMeta = ({ metaTitle, metaDescription, ogImage, currentUrl }) => {
+  const router = useRouter();
   const defaultTitle = "The News Genie | Latest News";
-  const defaultDescription =
-    "Stay informed with The News Genie - Your trusted source for authentic and latest news.";
+  const defaultDescription = "Stay informed with The News Genie - Your trusted source for authentic and latest news.";
+  const baseUrl = "https://thenewsgenie.com";
+  
+  // Get the current full URL
+  const currentPath = currentUrl || router.asPath;
+  const fullUrl = `${baseUrl}${currentPath}`;
+
+  // Truncate description if needed
+  const truncateDescription = (text, maxLength = 160) => {
+    if (!text) return defaultDescription;
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength).trim() + '...';
+  };
+
+  const finalDescription = truncateDescription(metaDescription);
 
   return (
     <Head>
@@ -17,7 +32,7 @@ const HeadMeta = ({ metaTitle, metaDescription }) => {
       />
       <meta
         name="description"
-        content={metaDescription ? metaDescription : defaultDescription}
+        content={finalDescription}
       />
 
       {/* Title */}
@@ -27,11 +42,7 @@ const HeadMeta = ({ metaTitle, metaDescription }) => {
       <link
         rel="icon"
         type="image/x-icon"
-        href={`${
-          process.env.NODE_ENV === "production"
-            ? process.env.NEXT_PUBLIC_BASEPATH ?? ""
-            : ""
-        }/favicon.ico`}
+        href={`${baseUrl}/favicon.ico`}
       />
 
       {/* Open Graph / Facebook */}
@@ -42,10 +53,13 @@ const HeadMeta = ({ metaTitle, metaDescription }) => {
       />
       <meta
         property="og:description"
-        content={metaDescription ? metaDescription : defaultDescription}
+        content={finalDescription}
       />
-      <meta property="og:url" content="https://thenewsgenie.com" />
-      <meta property="og:image" content="/og-image.png" />
+      <meta property="og:url" content={fullUrl} />
+      <meta 
+        property="og:image" 
+        content={ogImage || `${baseUrl}/og-image.png`}
+      />
 
       {/* Twitter */}
       <meta name="twitter:card" content="summary_large_image" />
@@ -55,12 +69,15 @@ const HeadMeta = ({ metaTitle, metaDescription }) => {
       />
       <meta
         name="twitter:description"
-        content={metaDescription ? metaDescription : defaultDescription}
+        content={finalDescription}
       />
-      <meta name="twitter:image" content="/twitter-image.png" />
+      <meta 
+        name="twitter:image" 
+        content={ogImage || `${baseUrl}/twitter-image.png`}
+      />
 
       {/* Canonical */}
-      <link rel="canonical" href="https://thenewsgenie.com" />
+      <link rel="canonical" href={fullUrl} />
     </Head>
   );
 };
