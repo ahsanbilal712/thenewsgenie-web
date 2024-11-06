@@ -2,7 +2,9 @@
 import React from "react";
 import Link from "next/link";
 import SourcesLayout from "./SourcesLayout";
+import FeedbackLayout from "./FeedbackLayout";
 import Breadcrumb from "../../common/Breadcrumb";
+
 const NewsLayout = ({ news }) => {
   if (!news)
     return (
@@ -36,6 +38,8 @@ const NewsLayout = ({ news }) => {
         <p className=" mt-16">{news.Summary}</p>
 
         <SourcesLayout news={news} />
+        
+        <FeedbackLayout newsId={news._id.toString()} />
       </div>
     </div>
   );
