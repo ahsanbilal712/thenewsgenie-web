@@ -72,7 +72,7 @@ export default async function handler(req, res) {
         image_url: 1
       })
       .sort({ created_at: -1 })
-      .limit(1000) // Limit to most recent 1000 articles
+      .limit(2000) // Limit to most recent 1000 articles
       .toArray();
 
     // Create base links array with static pages
