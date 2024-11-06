@@ -7,6 +7,7 @@ import SourcesLayout from "./SourcesLayout";
 import FeedbackLayout from "./FeedbackLayout";
 import Breadcrumb from "../../common/Breadcrumb";
 import { formatHeadlineForUrl } from '../../../utils/urlHelpers';
+import { seoConfig } from '../../../utils/seo-config';
 
 const NewsLayout = ({ news }) => {
   const router = useRouter();
@@ -57,6 +58,15 @@ const NewsLayout = ({ news }) => {
     }
   };
 
+  // Add keywords based on category and content
+  const generateKeywords = (newsItem) => {
+    const baseKeywords = ["news", newsItem.Category.toLowerCase(), "latest news"];
+    const headlineWords = newsItem.Headline.toLowerCase()
+      .split(' ')
+      .filter(word => word.length > 3);
+    return [...new Set([...baseKeywords, ...headlineWords])].join(', ');
+  };
+
   return (
     <>
       <Head>
@@ -88,6 +98,42 @@ const NewsLayout = ({ news }) => {
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
         />
+
+        {/* Additional SEO tags */}
+        <meta name="keywords" content={generateKeywords(news)} />
+        <meta name="author" content="The News Genie" />
+        <meta name="news_keywords" content={`${news.Category}, ${news.Headline.split(' ').slice(0, 5).join(', ')}`} />
+        
+        {/* Additional Open Graph tags */}
+        <meta property="og:locale" content="en_US" />
+        <meta property="og:updated_time" content={publishedDate} />
+        
+        {/* Additional Schema.org markup */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://thenewsgenie.com"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": news.Category,
+                "item": `https://thenewsgenie.com/categories/${news.Category.toLowerCase()}`
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "name": news.Headline
+              }
+            ]
+          })}
+        </script>
       </Head>
 
       <div className="news-article section-gap p-t-xs-15 p-t-sm-60">
