@@ -6,6 +6,7 @@ import Breadcrumb from "../components/common/Breadcrumb";
 import HomeNews from "../components/news/HomeNews";
 import { useState, useEffect } from "react";
 import Loading from "../components/loading/Loading";
+import { formatHeadlineForUrl } from '../utils/urlHelpers';
 
 function LatestNews() {
   const [news, setNews] = useState([]);
@@ -63,19 +64,6 @@ function LatestNews() {
     }
   };
 
-  if (error) {
-    return (
-      <>
-        <HeadMeta metaTitle="Latest News - Error" />
-        <HeaderTwo />
-        <div className="flex justify-center items-center h-[50vh]">
-          <div className="text-red-500 text-xl">{error}</div>
-        </div>
-        <FooterOne />
-      </>
-    );
-  }
-
   return (
     <>
       <HeadMeta metaTitle="Latest News" />
@@ -89,6 +77,10 @@ function LatestNews() {
 
         {isLoading && news.length === 0 ? (
           <Loading />
+        ) : error ? (
+          <div className="flex justify-center items-center h-[50vh]">
+            <div className="text-red-500 text-xl">{error}</div>
+          </div>
         ) : (
           <>
             <HomeNews news={news} />

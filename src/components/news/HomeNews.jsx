@@ -1,6 +1,8 @@
 import React from "react";
 import Link from "next/link";
 import PropTypes from "prop-types";
+import { formatHeadlineForUrl } from '../../utils/urlHelpers';
+import { useRouter } from 'next/router';
 
 function formatTimeAgo(createdAt) {
   const now = new Date();
@@ -21,11 +23,9 @@ function formatTimeAgo(createdAt) {
   }
 }
 
-const formatHeadlineForUrl = (headline) => {
-  return encodeURIComponent(headline);
-};
-
 const HomeNews = ({ news = [] }) => {
+  const router = useRouter();
+
   if (!Array.isArray(news)) {
     return <div>No news available</div>;
   }
@@ -34,6 +34,12 @@ const HomeNews = ({ news = [] }) => {
   const sortedNews = [...news].sort(
     (a, b) => new Date(b.created_at) - new Date(a.created_at)
   );
+
+  const handleNewsClick = (e, headline) => {
+    e.preventDefault();
+    const url = `/news/${formatHeadlineForUrl(headline)}`;
+    router.push(url);
+  };
 
   return (
     <div className="container">
@@ -46,7 +52,10 @@ const HomeNews = ({ news = [] }) => {
             >
               <div className="flex flex-col md:flex-row p-4 mt-[30px]">
                 <Link href={`/news/${formatHeadlineForUrl(newsItem.Headline)}`}>
-                  <a className="align-self-center">
+                  <a 
+                    className="align-self-center"
+                    onClick={(e) => handleNewsClick(e, newsItem.Headline)}
+                  >
                     <div className="w-[400px] h-[200px] lg:w-[210px] lg:h-[170px] overflow-hidden group">
                       <img
                         src={newsItem.image_url}
@@ -59,7 +68,10 @@ const HomeNews = ({ news = [] }) => {
                 <div className="media-body lg:mt-0 -mt-16 md:px-10 flex -ml-5 justify-between flex-col">
                   <div className="post-cat-group ml-3 m-b-xs-10">
                     <Link href={`/news/${formatHeadlineForUrl(newsItem.Headline)}`}>
-                      <a className={`post-cat cat-btn bg-color-blue-one`}>
+                      <a 
+                        className={`post-cat cat-btn bg-color-blue-one`}
+                        onClick={(e) => handleNewsClick(e, newsItem.Headline)}
+                      >
                         {newsItem.Category}
                       </a>
                     </Link>
@@ -67,7 +79,9 @@ const HomeNews = ({ news = [] }) => {
                   <div className="text-3xl md:text-2xl lg:text-3xl xl:text-5xl hover-line md:-mt-4 lg:-mt-8 font-bold"
                     style={{ lineHeight: "1.3" }}>
                     <Link href={`/news/${formatHeadlineForUrl(newsItem.Headline)}`}>
-                      <a>{newsItem.Headline}</a>
+                      <a onClick={(e) => handleNewsClick(e, newsItem.Headline)}>
+                        {newsItem.Headline}
+                      </a>
                     </Link>
                   </div>
                   <div className="text-sm mt-3 md:text-lg lg:text-xl">

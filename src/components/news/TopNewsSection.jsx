@@ -25,6 +25,18 @@ function formatTimeAgo(createdAt) {
   }
 }
 
+// Add this utility function at the top with other utilities
+function formatHeadlineForUrl(headline) {
+  return encodeURIComponent(headline)
+    .replace(/%20/g, '-')
+    .replace(/%2D/g, '-') // Keep existing dashes
+    .replace(/%2F/g, '-') // Replace forward slashes with dashes
+    .replace(/%26/g, 'and') // Replace & with 'and'
+    .replace(/%27/g, '') // Remove apostrophes
+    .replace(/%22/g, '') // Remove quotes
+    .replace(/-+/g, '-'); // Replace multiple dashes with single dash
+}
+
 const TopNewsSection = ({ news }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState([]);
@@ -60,7 +72,7 @@ const TopNewsSection = ({ news }) => {
   }, [searchTerm, debouncedSearch]);
 
   const handleNewsClick = (headline) => {
-    const url = `/news/${encodeURIComponent(headline || '')}`;
+    const url = `/news/${formatHeadlineForUrl(headline || '')}`;
     router.push(url);
   };
 
@@ -122,7 +134,7 @@ const TopNewsSection = ({ news }) => {
           <div className="w-full lg:w-1/2 mb-8 mt-3 lg:mb-0">
             {news.slice(0, 1).map((newsItem) => (
               <div className="flex flex-col py-4" key={newsItem._id}>
-                <Link href={`/news/${encodeURIComponent(newsItem.Headline)}`}>
+                <Link href={`/news/${formatHeadlineForUrl(newsItem.Headline)}`}>
                   <a className="flex-shrink-0">
                     <div className="w-full h-96 lg:h-[315px] overflow-hidden group">
                       <img
@@ -137,7 +149,7 @@ const TopNewsSection = ({ news }) => {
                 <div className="media-body flex flex-col justify-between">
                   <div className="post-cat-group px-4 -mt-20 lg:-mt-[50px] mb-2">
                     <Link
-                      href={`/news/${encodeURIComponent(newsItem.Headline)}`}
+                      href={`/news/${formatHeadlineForUrl(newsItem.Headline)}`}
                     >
                       <a className="post-cat cat-btn bg-color-blue-one text-white px-3">
                         {newsItem.Category}
@@ -149,7 +161,7 @@ const TopNewsSection = ({ news }) => {
                     style={{ lineHeight: "1.3" }}
                   >
                     <Link
-                      href={`/news/${encodeURIComponent(newsItem.Headline)}`}
+                      href={`/news/${formatHeadlineForUrl(newsItem.Headline)}`}
                     >
                       <a className="text-white">{newsItem.Headline}</a>
                     </Link>
@@ -173,7 +185,7 @@ const TopNewsSection = ({ news }) => {
                 {news.slice(1, 4).map((newsItem) => (
                   <div className="flex flex-row p-4 lg:p-4" key={newsItem._id}>
                     <Link
-                      href={`/news/${encodeURIComponent(newsItem.Headline)}`}
+                      href={`/news/${formatHeadlineForUrl(newsItem.Headline)}`}
                     >
                       <a className="flex-shrink-0">
                         <div className="w-48 h-36 lg:w-64 lg:h-52 overflow-hidden group">
@@ -189,7 +201,7 @@ const TopNewsSection = ({ news }) => {
                     <div className="media-body px-4 flex flex-col justify-between">
                       <div className="post-cat-group mb-2">
                         <Link
-                          href={`/news/${encodeURIComponent(
+                          href={`/news/${formatHeadlineForUrl(
                             newsItem.Headline
                           )}`}
                         >
@@ -203,7 +215,7 @@ const TopNewsSection = ({ news }) => {
                         style={{ lineHeight: "1.3" }}
                       >
                         <Link
-                          href={`/news/${encodeURIComponent(
+                          href={`/news/${formatHeadlineForUrl(
                             newsItem.Headline
                           )}`}
                         >

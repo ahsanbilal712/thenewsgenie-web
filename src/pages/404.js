@@ -1,13 +1,13 @@
 import Link from "next/link";
 import HeadMeta from "../components/elements/HeadMeta";
 import FooterOne from "../components/footer/FooterOne";
-import HeaderOne from "../components/header/HeaderOne";
+import HeaderTwo from "../components/header/HeaderTwo";
 
 const ErrorPage = () => {
     return (
         <>
             <HeadMeta metaTitle="404 Error Not Found" />
-            <HeaderOne />
+            <HeaderTwo />
             <div className="error-404-banner bg-grey-light-three">
                 <div className="container">
                     <div className="error-404-content text-center">

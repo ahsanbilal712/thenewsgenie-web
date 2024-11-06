@@ -5,6 +5,7 @@ import HeaderTwo from "../../components/header/HeaderTwo";
 import NewsLayout from "../../components/post/layout/NewsLayout";
 import Breadcrumb from "../../components/common/Breadcrumb";
 import { useRouter } from 'next/router';
+import { decodeHeadlineFromUrl } from '../../utils/urlHelpers';
 
 const NewsPage = ({ news }) => {
   const router = useRouter();
@@ -52,26 +53,121 @@ export const getServerSideProps = async (context) => {
   try {
     const client = await connectToDatabase();
     const db = client.db("intelli-news-db");
-    const decodedHeadline = decodeURIComponent(headline.replace(/-/g, ' '));
     
-    // Only fetch required fields
-    const news = await db
-      .collection("data_news")
-      .findOne(
-        { Headline: decodedHeadline },
-        { projection: { 
-          Headline: 1, 
-          Category: 1, 
-          Summary: 1, 
+    const decodedHeadline = decodeHeadlineFromUrl(headline);
+    console.log('Searching for headline:', decodedHeadline);
+
+    // Escape special regex characters in the headline
+    const escapeRegex = (string) => {
+      return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    };
+
+    // Create search patterns
+    const searchPatterns = [
+      // Exact match (case-insensitive)
+      { 
+        Headline: new RegExp(`^${escapeRegex(decodedHeadline)}$`, 'i') 
+      },
+      // Match with optional apostrophes
+      { 
+        Headline: new RegExp(
+          escapeRegex(decodedHeadline)
+            .replace(/s\b/g, "('s|s)")
+            .replace(/'s\b/g, "('s|s)"),
+          'i'
+        ) 
+      },
+      // Match with flexible spacing and punctuation
+      { 
+        Headline: new RegExp(
+          escapeRegex(decodedHeadline)
+            .replace(/\s+/g, "\\s+")
+            .replace(/[:.]/g, "[:.]*"),
+          'i'
+        ) 
+      },
+      // Match words in sequence with flexible spacing
+      {
+        Headline: new RegExp(
+          decodedHeadline
+            .split(' ')
+            .map(word => escapeRegex(word))
+            .join('\\s+'),
+          'i'
+        )
+      }
+    ];
+
+    // Try to find the news with any of the patterns
+    let news = await db.collection("data_news").findOne(
+      {
+        $or: searchPatterns
+      },
+      {
+        projection: {
+          Headline: 1,
+          Category: 1,
+          Summary: 1,
           sources: 1,
           image_url: 1,
-          created_at: 1 
-        }}
-      );
+          Image_source_name: 1,
+          created_at: 1,
+          feedbacks: 1
+        }
+      }
+    );
 
     if (!news) {
+      // If no match found, try a more flexible word-based search
+      news = await db.collection("data_news").findOne(
+        {
+          Headline: {
+            $regex: new RegExp(
+              decodedHeadline
+                .split(' ')
+                .filter(word => word.length > 2)
+                .map(word => `(?:${escapeRegex(word)}|${escapeRegex(word)}['']?s)`)
+                .join('.*'),
+              'i'
+            )
+          }
+        },
+        {
+          projection: {
+            Headline: 1,
+            Category: 1,
+            Summary: 1,
+            sources: 1,
+            image_url: 1,
+            Image_source_name: 1,
+            created_at: 1,
+            feedbacks: 1
+          }
+        }
+      );
+    }
+
+    if (!news) {
+      console.log('No match found. Attempted patterns:', {
+        decodedHeadline,
+        patterns: searchPatterns.map(p => p.Headline.toString()),
+        fallbackPattern: decodedHeadline
+          .split(' ')
+          .filter(word => word.length > 2)
+          .map(word => `(?:${word}|${word}['']?s)`)
+          .join('.*')
+      });
+
+      const availableHeadlines = await db.collection("data_news")
+        .find({}, { projection: { Headline: 1 } })
+        .limit(5)
+        .toArray();
+      console.log('Sample of available headlines:', availableHeadlines);
+
       return { notFound: true };
     }
+
+    console.log('Found matching news:', news.Headline);
 
     return {
       props: {
@@ -79,7 +175,7 @@ export const getServerSideProps = async (context) => {
       },
     };
   } catch (error) {
-    console.error("Error fetching news:", error);
+    console.error("Error fetching news:", error, "Headline:", headline);
     return { props: { news: null } };
   }
 };

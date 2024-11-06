@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { formatHeadlineForUrl } from '../../utils/urlHelpers';
 
 // Utility function to format the time ago
 function formatTimeAgo(createdAt) {
@@ -83,16 +84,14 @@ const CategoryNews = ({ category, news }) => {
 
   const handleNewsClick = (e, headline) => {
     e.preventDefault();
-    const url = `/news/${encodeURIComponent(headline)}`;
-    router.push(url).then(() => {
-      window.location.href = url; // Force a full page reload
-    });
+    const url = `/news/${formatHeadlineForUrl(headline)}`;
+    router.push(url);
   };
 
   return (
     <div className="p-4 bg-gray-100 rounded-xl shadow-md">
       <h2 className="text-5xl flex justify-center font-bold mb-4">
-        <Link href={`/categories/${category}`}>
+        <Link href={`/categories/${formatHeadlineForUrl(category)}`}>
           <a className="mx-auto hover:text-blue-600 transition-colors duration-300">
             {category} {">"}
           </a>
@@ -101,7 +100,7 @@ const CategoryNews = ({ category, news }) => {
       <hr className="text-lg h-1 w-full bg-slate-600 mb-4" />
       {news.slice(0, 3).map((item) => (
         <div className="flex flex-row p-4" key={item._id}>
-          <Link href={`/news/${encodeURIComponent(item.Headline)}`}>
+          <Link href={`/news/${formatHeadlineForUrl(item.Headline)}`}>
             <a 
               className="flex-shrink-0 cursor-pointer"
               onClick={(e) => handleNewsClick(e, item.Headline)}
@@ -117,15 +116,16 @@ const CategoryNews = ({ category, news }) => {
           </Link>
 
           <div className="media-body px-4 flex flex-col justify-between">
-            <Link href={`/news/${encodeURIComponent(item.Headline)}`}>
+            <Link href={`/news/${formatHeadlineForUrl(item.Headline)}`}>
               <a 
                 className="text-xl font-bold -mt-4 cursor-pointer group"
                 style={{ lineHeight: "1.3" }}
                 onClick={(e) => handleNewsClick(e, item.Headline)}
               >
- <span className="text-black bg-gradient-to-r mt-1 from-black to-black bg-no-repeat [background-position:0_88%] [background-size:0%_2px] group-hover:[background-size:100%_2px] transition-all py-1 duration-300">
-                    {item.Headline}
-                  </span>              </a>
+                <span className="text-black bg-gradient-to-r mt-1 from-black to-black bg-no-repeat [background-position:0_88%] [background-size:0%_2px] group-hover:[background-size:100%_2px] transition-all py-1 duration-300">
+                  {item.Headline}
+                </span>
+              </a>
             </Link>
             <div className="text-lg mt-1">{formatTimeAgo(item.created_at)}</div>
           </div>

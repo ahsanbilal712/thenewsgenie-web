@@ -6,13 +6,13 @@ import ContactInfo from "../components/contact/ContactInfo";
 import HeadMeta from "../components/elements/HeadMeta";
 import SectionTitleTwo from "../components/elements/SectionTitleTwo";
 import FooterOne from "../components/footer/FooterOne";
-import HeaderOne from "../components/header/HeaderOne";
+import HeaderTwo from "../components/header/HeaderTwo";
 
 const ContactPage = () => {
   return (
     <>
       <HeadMeta metaTitle="Contact Us" />
-      <HeaderOne />
+      <HeaderTwo />
       <Breadcrumb aPage="Contact Us" />
       <BreadcrumbBanner pageTitle="Contact Us" />
       <div className="axil-about-us section-gap  section-gap-top__with-text">

@@ -9,10 +9,10 @@ import Breadcrumb from "../../components/common/Breadcrumb";
 import FooterOne from "../../components/footer/FooterOne";
 import HeaderTwo from "../../components/header/HeaderTwo";
 import Loading from "../../components/loading/Loading";
+import { formatHeadlineForUrl } from '../../utils/urlHelpers';
 
-const formatHeadlineForUrl = (headline) => {
-  return encodeURIComponent(headline);
-};
+
+
 
 function formatTimeAgo(createdAt) {
   const now = new Date();

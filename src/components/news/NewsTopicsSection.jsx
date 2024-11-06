@@ -3,6 +3,7 @@ import { FiSearch, FiPlus } from "react-icons/fi";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { motion, AnimatePresence } from "framer-motion";
+import { formatHeadlineForUrl } from '../../utils/urlHelpers';
 
 // Utility function to format the time ago
 function formatTimeAgo(createdAt) {
@@ -160,10 +161,8 @@ const TopicNews = ({ topic, news }) => {
 
   const handleNewsClick = (e, headline) => {
     e.preventDefault();
-    const url = `/news/${encodeURIComponent(headline)}`;
-    router.push(url).then(() => {
-      window.location.href = url; // Force a full page reload
-    });
+    const url = `/news/${formatHeadlineForUrl(headline)}`;
+    router.push(url);
   };
 
   const loadMore = () => {
@@ -186,7 +185,7 @@ const TopicNews = ({ topic, news }) => {
             transition={{ duration: 0.3, delay: index * 0.1 }}
             className="flex flex-row p-4"
           >
-            <Link href={`/news/${encodeURIComponent(item.Headline)}`}>
+            <Link href={`/news/${formatHeadlineForUrl(item.Headline)}`}>
               <a 
                 className="flex-shrink-0 cursor-pointer"
                 onClick={(e) => handleNewsClick(e, item.Headline)}
@@ -202,7 +201,7 @@ const TopicNews = ({ topic, news }) => {
             </Link>
 
             <div className="media-body px-4 flex flex-col justify-between">
-              <Link href={`/news/${encodeURIComponent(item.Headline)}`}>
+              <Link href={`/news/${formatHeadlineForUrl(item.Headline)}`}>
                 <a 
                   className="text-xl font-bold -mt-4 cursor-pointer group"
                   style={{ lineHeight: "1.3" }}
