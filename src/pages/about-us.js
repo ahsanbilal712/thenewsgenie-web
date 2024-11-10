@@ -16,8 +16,22 @@ const AboutUsPage = () => {
       <div className="axil-about-us section-gap section-gap-top__with-text">
         <div className="container">
           <SectionTitleTwo
+            title="How we work"
+            paragraph=" We gather news from reliable sources like Geo News, Dawn, ARY, and Tribune every hour. 
+            Using advanced technology, similar stories are grouped together, and the main points are 
+            summarized to give you a clear overview. Each fact is matched with its source, so you 
+            know where it comes from. After publishing, we monitor feedback to ensure quality. Users 
+            can explore news, search topics, and even follow specific interests for tailored updates, 
+            while admins manage content for accuracy and relevance. This automated process keeps you 
+            informed efficiently and transparently."
+          />
+        </div>
+      </div>
+      <div className="axil-about-us section-gap section-gap-top__with-text">
+        <div className="container">
+          <SectionTitleTwo
             title="Who We Are"
-            paragraph="IntelliNews is a cutting-edge, AI-driven news platform that curates and delivers the latest news by aggregating data from various credible sources. Our mission is to provide reliable, up-to-date news that is unbiased and insightful, helping you stay informed in today's fast-paced world."
+            paragraph="The News Genie is a cutting-edge, AI-driven news platform that curates and delivers the latest news by aggregating data from various credible sources. Our mission is to provide reliable, up-to-date news that is unbiased and insightful, helping you stay informed in today's fast-paced world."
           />
         </div>
       </div>
@@ -86,17 +100,23 @@ const AboutUsPage = () => {
             IntelliNews is your go-to source for trusted news.
           </p>
 
+          <h3>How We Work</h3>
+          <p>
+            We gather news from reliable sources like Geo News, Dawn, ARY, and Tribune every hour. 
+            Using advanced technology, similar stories are grouped together, and the main points are 
+            summarized to give you a clear overview. Each fact is matched with its source, so you 
+            know where it comes from. After publishing, we monitor feedback to ensure quality. Users 
+            can explore news, search topics, and even follow specific interests for tailored updates, 
+            while admins manage content for accuracy and relevance. This automated process keeps you 
+            informed efficiently and transparently.
+          </p>
+
           <h3>Contact Us</h3>
           <p>
             Have questions, feedback, or want to get in touch with our team?
             We're here to help! Reach out to us at:
             <br />
-            <strong>Email:</strong> support@intellinews.com
-            <br />
-            <strong>Phone:</strong> +1 (555) 123-4567
-            <br />
-            <strong>Address:</strong> 1234 News Street, Information City, CA,
-            USA
+            <strong>Email:</strong> thenewsgenie1@gmail.com
           </p>
         </div>
       </div>

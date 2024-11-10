@@ -107,11 +107,7 @@ const HeaderTwo = () => {
                       <a>About Us</a>
                     </Link>
                   </li>
-                  <li>
-                    <Link href="/contact">
-                      <a>Contact</a>
-                    </Link>
-                  </li>
+             
                   <li>
                     <Link href="/privacy-policy">
                       <a>Privacy Policy</a>
