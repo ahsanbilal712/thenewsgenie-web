@@ -64,38 +64,10 @@ export const getServerSideProps = async (context) => {
 
     // Create search patterns
     const searchPatterns = [
-      // Exact match (case-insensitive)
-      { 
-        Headline: new RegExp(`^${escapeRegex(decodedHeadline)}$`, 'i') 
-      },
-      // Match with optional apostrophes
-      { 
-        Headline: new RegExp(
-          escapeRegex(decodedHeadline)
-            .replace(/s\b/g, "('s|s)")
-            .replace(/'s\b/g, "('s|s)"),
-          'i'
-        ) 
-      },
-      // Match with flexible spacing and punctuation
-      { 
-        Headline: new RegExp(
-          escapeRegex(decodedHeadline)
-            .replace(/\s+/g, "\\s+")
-            .replace(/[:.]/g, "[:.]*"),
-          'i'
-        ) 
-      },
-      // Match words in sequence with flexible spacing
-      {
-        Headline: new RegExp(
-          decodedHeadline
-            .split(' ')
-            .map(word => escapeRegex(word))
-            .join('\\s+'),
-          'i'
-        )
-      }
+      { Headline: new RegExp(`^${escapeRegex(decodedHeadline)}$`, 'i') },
+      { Headline: new RegExp(escapeRegex(decodedHeadline).replace(/s\b/g, "('s|s)").replace(/'s\b/g, "('s|s)"), 'i') },
+      { Headline: new RegExp(escapeRegex(decodedHeadline).replace(/\s+/g, "\\s+").replace(/[:.]/g, "[:.]*"), 'i') },
+      { Headline: new RegExp(decodedHeadline.split(' ').map(word => escapeRegex(word)).join('\\s+'), 'i') }
     ];
 
     // Try to find the news with any of the patterns
