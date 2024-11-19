@@ -18,6 +18,16 @@ const newsSummarySchema = new mongoose.Schema(
     ],
     Image_source_name: String,
     image_url: String,
+    similar_facts: [String],
+    conflicting_facts: [
+      {
+        fact: String,
+        source: {
+          SourceName: String,
+          SourceUrl: String,
+        },
+      },
+    ],
     created_at: {
       type: Date,
       default: Date.now, // Automatically set the created_at field to the current date

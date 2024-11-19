@@ -8,7 +8,7 @@ import FeedbackLayout from "./FeedbackLayout";
 import Breadcrumb from "../../common/Breadcrumb";
 import { formatHeadlineForUrl } from '../../../utils/urlHelpers';
 import { seoConfig } from '../../../utils/seo-config';
-
+import ConflictFactsLayout from "./ConflictFactsLayout";
 const NewsLayout = ({ news }) => {
   const router = useRouter();
   
@@ -224,6 +224,7 @@ const NewsLayout = ({ news }) => {
           <SourcesLayout news={news} />
           
           <FeedbackLayout newsId={news._id.toString()} />
+          <ConflictFactsLayout newsId={news._id.toString()} />
         </div>
       </div>
     </>
