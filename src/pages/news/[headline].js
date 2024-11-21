@@ -84,7 +84,9 @@ export const getServerSideProps = async (context) => {
           image_url: 1,
           Image_source_name: 1,
           created_at: 1,
-          feedbacks: 1
+          feedbacks: 1,
+          similar_facts: 1,
+          conflicting_facts: 1
         }
       }
     );
@@ -113,7 +115,9 @@ export const getServerSideProps = async (context) => {
             image_url: 1,
             Image_source_name: 1,
             created_at: 1,
-            feedbacks: 1
+            feedbacks: 1,
+            similar_facts: 1,
+            conflicting_facts: 1
           }
         }
       );

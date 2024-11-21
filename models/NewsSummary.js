@@ -1,6 +1,6 @@
 // models/NewsSummary.js
-import mongoose from "mongoose";
-import { slugify } from "../src/utils";
+const mongoose = require('mongoose');
+const { slugify } = require('../src/utils');
 
 // Define the schema with the necessary fields including a flexible keyfacts object
 const newsSummarySchema = new mongoose.Schema(
@@ -50,8 +50,4 @@ newsSummarySchema.pre("save", function (next) {
   next();
 });
 
-const NewsSummary =
-  mongoose.models.NewsSummary ||
-  mongoose.model("NewsSummary", newsSummarySchema);
-
-export default NewsSummary;
+module.exports = mongoose.models.NewsSummary || mongoose.model('NewsSummary', newsSummarySchema);

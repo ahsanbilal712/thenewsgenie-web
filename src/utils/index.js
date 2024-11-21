@@ -46,5 +46,4 @@ const dateFormate = function () {
 	return todayDate;
 }
 
-
 export { slugify, removeDuplicates, SortingByDate, dateFormate };

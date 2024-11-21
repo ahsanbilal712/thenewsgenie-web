@@ -1,10 +1,10 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { MdWarning } from 'react-icons/md';
+import { MdCompareArrows } from 'react-icons/md';
 import { FaExternalLinkAlt } from 'react-icons/fa';
 
-const ConflictFactsLayout = ({ conflictingFacts }) => {
-  if (!conflictingFacts || conflictingFacts.length === 0) {
+const SimilarFactsLayout = ({ similarFacts }) => {
+  if (!similarFacts || similarFacts.length === 0) {
     return null;
   }
 
@@ -18,15 +18,15 @@ const ConflictFactsLayout = ({ conflictingFacts }) => {
     >
       <div className="flex items-center gap-3 mb-6">
         <div className="p-2 bg-blue-500 rounded-full dark:bg-blue-800">
-          <MdWarning className="text-white text-2xl dark:text-blue-200" />
+          <MdCompareArrows className="text-white text-2xl dark:text-blue-200" />
         </div>
         <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
-          Conflicting Facts
+          Similar Facts
         </h2>
       </div>
 
       <div className="space-y-5">
-        {conflictingFacts.map((item, index) => (
+        {similarFacts.map((item, index) => (
           <motion.div
             key={index}
             initial={{ x: -20, opacity: 0 }}
@@ -77,5 +77,4 @@ const ConflictFactsLayout = ({ conflictingFacts }) => {
   );
 };
 
-export default ConflictFactsLayout;
-
+export default SimilarFactsLayout;

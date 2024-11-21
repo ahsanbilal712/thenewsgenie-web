@@ -8,10 +8,12 @@ import FeedbackLayout from "./FeedbackLayout";
 import Breadcrumb from "../../common/Breadcrumb";
 import { formatHeadlineForUrl } from '../../../utils/urlHelpers';
 import { seoConfig } from '../../../utils/seo-config';
-import ConflictFactsLayout from "./ConflictFactsLayout";
+import FactsLayout from "./FactsLayout";
 const NewsLayout = ({ news }) => {
   const router = useRouter();
   
+  console.log("News Data in NewsLayout:", news);
+
   if (!news) return (
     <div className="news-not-found text-center py-10">No news found.</div>
   );
@@ -66,6 +68,12 @@ const NewsLayout = ({ news }) => {
       .filter(word => word.length > 3);
     return [...new Set([...baseKeywords, ...headlineWords])].join(', ');
   };
+
+  // First, verify the data with a console log
+  console.log("News Data:", {
+    conflicting_facts: news.conflicting_facts,
+    similar_facts: news.similar_facts
+  });
 
   return (
     <>
@@ -223,8 +231,16 @@ const NewsLayout = ({ news }) => {
 
           <SourcesLayout news={news} />
           
+          {(news.conflicting_facts?.length > 0 || news.similar_facts?.length > 0) && (
+            <div className="mt-8">
+              <FactsLayout 
+                conflictingFacts={Array.isArray(news.conflicting_facts) ? news.conflicting_facts : []}
+                similarFacts={Array.isArray(news.similar_facts) ? news.similar_facts : []}
+              />
+            </div>
+          )}
+
           <FeedbackLayout newsId={news._id.toString()} />
-          <ConflictFactsLayout newsId={news._id.toString()} />
         </div>
       </div>
     </>
