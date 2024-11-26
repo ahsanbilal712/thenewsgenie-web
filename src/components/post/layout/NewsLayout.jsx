@@ -199,48 +199,68 @@ const NewsLayout = ({ news }) => {
         </script>
       </Head>
 
-      <div className="news-article section-gap p-t-xs-15 p-t-sm-60">
-        <div className="container">
-          <h1 className="news-headline">{news.Headline}</h1>
-          <hr className="h-[2px] my-8 bg-gray-700 border-0 dark:bg-gray-900" />
-          <h4 className="news-category">Category: {news.Category}</h4>
-          <div className="rounded-xl mx-auto p-10 flex flex-col justify-center">
-            <img
-              src={news.image_url}
-              alt={news.Headline}
-              title={news.Headline}
-              loading="eager"
-              width="1200"
-              height="630"
-              className="news-image"
-              style={{
-                borderRadius: "20px",
-                padding: "1rem",
-                display: "block",
-                margin: "0 auto",
-              }}
-              itemProp="image"
-            />
-            <div className="mx-auto font-bold">
-              Image Credits: {news.Image_source_name}
+      <div className="news-article bg-white min-h-screen">
+        <div className="max-w-[120rem] mx-auto px-6 lg:px-12 py-12">
+          {/* Content grid - Moved grid up before header */}
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-16">
+            {/* Main content column */}
+            <div className="lg:col-span-3">
+              {/* Header section */}
+              <div className="mb-12">
+                <h1 className="text-6xl font-bold text-gray-800 mb-6 text-left leading-tight">
+                  {news.Headline}
+                </h1>
+                <div className="flex items-start text-gray-600 space-x-6">
+                  <span className="bg-blue-500 text-white px-6 py-2.5 rounded-full text-lg font-medium inline-block">
+                    {news.Category}
+                  </span>
+                  <span className="text-lg mt-2">
+                    {new Date(news.created_at).toLocaleDateString()}
+                  </span>
+                </div>
+              </div>
+
+              {/* Rest of the main content */}
+              <div className="mb-12">
+                <div className="w-full lg:w-[88%] relative rounded-lg overflow-hidden">
+                  <img
+                    src={news.image_url}
+                    alt={news.Headline}
+                    className="w-full h-auto object-cover"
+                    loading="eager"
+                  />
+                </div>
+                <div className="mt-3 text-base text-gray-500">
+                  Image Credits: {news.Image_source_name}
+                </div>
+              </div>
+
+              <div className="prose max-w-none">
+                <p className="text-2xl text-gray-700 leading-relaxed text-left mb-12 max-w-[90%]">
+                  {news.Summary}
+                </p>
+              </div>
+
+              <hr className="my-16 border-gray-200" />
+              
+              <div className="max-w-[95%]">
+                <SourcesLayout news={news} />
+                <FeedbackLayout newsId={news._id.toString()} />
+              </div>
+            </div>
+
+            {/* Facts column */}
+            <div className="lg:col-span-1">
+              {(news.similar_facts?.length > 0 || news.conflicting_facts?.length > 0) && (
+                <div className="w-full bg-white rounded-lg">
+                  <FactsLayout 
+                    similarFacts={Array.isArray(news.similar_facts) ? news.similar_facts : []}
+                    conflictingFacts={Array.isArray(news.conflicting_facts) ? news.conflicting_facts : []}
+                  />
+                </div>
+              )}
             </div>
           </div>
-          <hr className="h-[2px] my-8 bg-gray-700 border-0 dark:bg-gray-900" />
-
-          <p className="mt-16">{news.Summary}</p>
-
-          <SourcesLayout news={news} />
-          
-          {(news.conflicting_facts?.length > 0 || news.similar_facts?.length > 0) && (
-            <div className="mt-8">
-              <FactsLayout 
-                conflictingFacts={Array.isArray(news.conflicting_facts) ? news.conflicting_facts : []}
-                similarFacts={Array.isArray(news.similar_facts) ? news.similar_facts : []}
-              />
-            </div>
-          )}
-
-          <FeedbackLayout newsId={news._id.toString()} />
         </div>
       </div>
     </>
