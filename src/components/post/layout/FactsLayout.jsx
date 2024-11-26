@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MdCompareArrows, MdWarning } from 'react-icons/md';
 import { FaExternalLinkAlt, FaChevronDown, FaChevronUp } from 'react-icons/fa';
+import RelatedCategoryNews from './RelatedCategoryNews';
 
-const FactsLayout = ({ conflictingFacts = [], similarFacts = [] }) => {
+const FactsLayout = ({ conflictingFacts = [], similarFacts = [], news, isLoading }) => {
   const [showAllSimilar, setShowAllSimilar] = useState(false);
   const [showAllConflicting, setShowAllConflicting] = useState(false);
 
@@ -161,6 +162,14 @@ const FactsLayout = ({ conflictingFacts = [], similarFacts = [] }) => {
           </div>
         </section>
       )}
+
+      {/* Related Category News Section */}
+      <RelatedCategoryNews 
+        category={news.Category}
+        news={news.categoryNews || []}
+        currentNewsId={news._id}
+        isLoading={isLoading}
+      />
     </div>
   );
 };

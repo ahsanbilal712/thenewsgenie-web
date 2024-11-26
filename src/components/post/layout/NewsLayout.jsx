@@ -1,5 +1,5 @@
 // src/components/post/NewsLayout.jsx
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Head from "next/head";
 import { useRouter } from 'next/router';
@@ -10,6 +10,28 @@ import { formatHeadlineForUrl } from '../../../utils/urlHelpers';
 import { seoConfig } from '../../../utils/seo-config';
 import FactsLayout from "./FactsLayout";
 const NewsLayout = ({ news }) => {
+  const [categoryNews, setCategoryNews] = useState([]);
+  const [isLoadingNews, setIsLoadingNews] = useState(true);
+
+  useEffect(() => {
+    const fetchCategoryNews = async () => {
+      setIsLoadingNews(true);
+      try {
+        const response = await fetch(`/api/categories-news?categories=${JSON.stringify([news.Category])}`);
+        const data = await response.json();
+        setCategoryNews(data);
+      } catch (error) {
+        console.error('Error fetching category news:', error);
+      } finally {
+        setIsLoadingNews(false);
+      }
+    };
+
+    if (news?.Category) {
+      fetchCategoryNews();
+    }
+  }, [news?.Category]);
+
   const router = useRouter();
   
   console.log("News Data in NewsLayout:", news);
@@ -251,11 +273,17 @@ const NewsLayout = ({ news }) => {
 
             {/* Facts column */}
             <div className="lg:col-span-1">
-              {(news.similar_facts?.length > 0 || news.conflicting_facts?.length > 0) && (
+              {(news.similar_facts?.length > 0 || news.conflicting_facts?.length > 0 || !isLoadingNews) && (
                 <div className="w-full bg-white rounded-lg">
                   <FactsLayout 
                     similarFacts={Array.isArray(news.similar_facts) ? news.similar_facts : []}
                     conflictingFacts={Array.isArray(news.conflicting_facts) ? news.conflicting_facts : []}
+                    news={{
+                      Category: news.Category,
+                      _id: news._id,
+                      categoryNews: categoryNews
+                    }}
+                    isLoading={isLoadingNews}
                   />
                 </div>
               )}
