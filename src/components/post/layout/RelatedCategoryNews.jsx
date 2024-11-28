@@ -4,8 +4,8 @@ import { motion } from 'framer-motion';
 import { FaNewspaper } from 'react-icons/fa';
 
 const RelatedCategoryNews = ({ category, news = [], currentNewsId, isLoading }) => {
-  // Don't render if there's no related news or only the current article
-  if (!news.length || (news.length === 1 && news[0]._id === currentNewsId)) {
+  // Don't render if there's no related news
+  if (!news || news.length === 0) {
     return null;
   }
 

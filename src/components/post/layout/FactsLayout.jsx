@@ -30,13 +30,7 @@ const FactsLayout = ({ conflictingFacts = [], similarFacts = [], news, isLoading
         />
       )}
 
-      {/* Related Category News Section */}
-      <RelatedCategoryNews 
-        category={news.Category}
-        news={news.categoryNews || []}
-        currentNewsId={news._id}
-        isLoading={isLoading}
-      />
+     
     </div>
   );
 };

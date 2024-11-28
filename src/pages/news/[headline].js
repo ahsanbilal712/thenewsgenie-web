@@ -7,7 +7,7 @@ import Breadcrumb from "../../components/common/Breadcrumb";
 import { useRouter } from 'next/router';
 import { decodeHeadlineFromUrl } from '../../utils/urlHelpers';
 
-const NewsPage = ({ news }) => {
+const NewsPage = ({ news, relatedNews }) => {
   const router = useRouter();
 
   if (router.isFallback) {
@@ -21,7 +21,7 @@ const NewsPage = ({ news }) => {
       {news && <Breadcrumb bCat={news.Category} aPage={news.Headline} />}
 
       {news ? (
-        <NewsLayout news={news} />
+        <NewsLayout news={news} initialRelatedNews={relatedNews} />
       ) : (
         <div className="flex-grow flex justify-center items-center">
           <h1 className="text-3xl font-bold">News Not Found</h1>
@@ -145,14 +145,34 @@ export const getServerSideProps = async (context) => {
 
     console.log('Found matching news:', news.Headline);
 
+    // Fetch related news for the same category
+    const relatedNews = await db.collection("data_news").find(
+      {
+        Category: news.Category,
+        _id: { $ne: news._id }  // Exclude current news
+      },
+      {
+        projection: {
+          Headline: 1,
+          Category: 1,
+          Summary: 1,
+          image_url: 1,
+          created_at: 1,
+        },
+        sort: { created_at: -1 },
+        limit: 4
+      }
+    ).toArray();
+
     return {
       props: {
         news: JSON.parse(JSON.stringify(news)),
+        relatedNews: JSON.parse(JSON.stringify(relatedNews)),
       },
     };
   } catch (error) {
     console.error("Error fetching news:", error, "Headline:", headline);
-    return { props: { news: null } };
+    return { props: { news: null, relatedNews: [] } };
   }
 };
 

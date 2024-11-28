@@ -9,7 +9,8 @@ import Breadcrumb from "../../common/Breadcrumb";
 import { formatHeadlineForUrl } from '../../../utils/urlHelpers';
 import { seoConfig } from '../../../utils/seo-config';
 import FactsLayout from "./FactsLayout";
-const NewsLayout = ({ news }) => {
+import RelatedCategoryNews from "./RelatedCategoryNews";
+const NewsLayout = ({ news, initialRelatedNews = [] }) => {
   const [categoryNews, setCategoryNews] = useState([]);
   const [isLoadingNews, setIsLoadingNews] = useState(true);
 
@@ -287,6 +288,12 @@ const NewsLayout = ({ news }) => {
                   />
                 </div>
               )}
+
+                <RelatedCategoryNews 
+                  category={news.Category} 
+                  news={initialRelatedNews} 
+                  currentNewsId={news._id} 
+                />
             </div>
           </div>
         </div>
@@ -327,6 +334,7 @@ const NewsLayout = ({ news }) => {
           </div>
         </div>
       </div>
+
     </>
   );
 };
