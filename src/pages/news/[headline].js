@@ -7,7 +7,7 @@ import Breadcrumb from "../../components/common/Breadcrumb";
 import { useRouter } from 'next/router';
 import { decodeHeadlineFromUrl } from '../../utils/urlHelpers';
 
-const NewsPage = ({ news, relatedNews }) => {
+const NewsPage = ({ news, relatedNews, latestNews }) => {
   const router = useRouter();
 
   if (router.isFallback) {
@@ -21,7 +21,7 @@ const NewsPage = ({ news, relatedNews }) => {
       {news && <Breadcrumb bCat={news.Category} aPage={news.Headline} />}
 
       {news ? (
-        <NewsLayout news={news} initialRelatedNews={relatedNews} />
+        <NewsLayout news={news} initialRelatedNews={relatedNews} latestNews={latestNews} />
       ) : (
         <div className="flex-grow flex justify-center items-center">
           <h1 className="text-3xl font-bold">News Not Found</h1>
@@ -160,7 +160,22 @@ export const getServerSideProps = async (context) => {
           created_at: 1,
         },
         sort: { created_at: -1 },
-        limit: 4
+        limit: 6
+      }
+    ).toArray();
+
+    // Fetch latest news
+    const latestNews = await db.collection("data_news").find(
+      {},
+      {
+        projection: {
+          Headline: 1,
+          Category: 1,
+          image_url: 1,
+          created_at: 1,
+        },
+        sort: { created_at: -1 },
+        limit: 10
       }
     ).toArray();
 
@@ -168,11 +183,12 @@ export const getServerSideProps = async (context) => {
       props: {
         news: JSON.parse(JSON.stringify(news)),
         relatedNews: JSON.parse(JSON.stringify(relatedNews)),
+        latestNews: JSON.parse(JSON.stringify(latestNews)),
       },
     };
   } catch (error) {
     console.error("Error fetching news:", error, "Headline:", headline);
-    return { props: { news: null, relatedNews: [] } };
+    return { props: { news: null, relatedNews: [], latestNews: [] } };
   }
 };
 

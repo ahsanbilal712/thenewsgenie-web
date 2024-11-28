@@ -66,8 +66,8 @@ const RelatedCategoryNews = ({ category, news = [], currentNewsId, isLoading }) 
                             {item.Headline}
                           </span>
                         </h3>
-                        <p className="text-gray-600 text-base leading-relaxed line-clamp-2 mt-2">
-                          {item.Summary}
+                        <p className="text-gray-600 text-base leading-relaxed line-clamp-2 ">
+                          {formatTimeAgo(item.created_at)}
                         </p>
                       </div>
                     
