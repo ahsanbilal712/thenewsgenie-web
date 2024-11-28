@@ -290,6 +290,42 @@ const NewsLayout = ({ news }) => {
             </div>
           </div>
         </div>
+
+        {/* Add the horizontal latest news section */}
+        <div className="border-t border-gray-100 bg-gray-50">
+          <div className="max-w-[120rem] mx-auto px-6 lg:px-12 py-12">
+            <h2 className="text-3xl font-bold mb-8">Latest News</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-6">
+              {Array.isArray(categoryNews) && categoryNews.slice(0, 6).map((item) => (
+                <Link 
+                  key={item._id} 
+                  href={`/news/${formatHeadlineForUrl(item.Headline)}`}
+                >
+                  <div className="group block bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                    <div className="aspect-w-16 aspect-h-9">
+                      <img
+                        src={item.image_url}
+                        alt={item.Headline}
+                        className="object-cover w-full h-full"
+                      />
+                    </div>
+                    <div className="p-4">
+                      <span className="inline-block px-2 py-1 text-xs bg-blue-500 text-white rounded-full mb-2">
+                        {item.Category}
+                      </span>
+                      <h3 className="text-sm font-semibold line-clamp-2 group-hover:text-blue-500 transition-colors">
+                        {item.Headline}
+                      </h3>
+                      <p className="text-xs text-gray-500 mt-2">
+                        {new Date(item.created_at).toLocaleDateString()}
+                      </p>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     </>
   );

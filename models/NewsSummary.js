@@ -7,7 +7,7 @@ const newsSummarySchema = new mongoose.Schema(
   {
     _id: mongoose.Schema.Types.ObjectId,
     Headline: String,
-    Category: String, // Add Category field
+    Category: String,
     Summary: String,
     sources: [
       {
@@ -21,21 +21,22 @@ const newsSummarySchema = new mongoose.Schema(
     similar_facts: [String],
     conflicting_facts: [
       {
-        fact: String,
-        source: {
-          SourceName: String,
-          SourceUrl: String,
-        },
-      },
+        topic: String,
+        conflicts: [
+          {
+            source: String,
+            claim: String,
+          }
+        ]
+      }
     ],
     created_at: {
       type: Date,
-      default: Date.now, // Automatically set the created_at field to the current date
+      default: Date.now,
     },
   },
   {
     collection: "data_news",
-    // Disable automatic updatedAt field
     timestamps: {
       createdAt: "created_at",
       updatedAt: false,
