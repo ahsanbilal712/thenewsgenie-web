@@ -224,7 +224,7 @@ const NewsLayout = ({ news }) => {
       <div className="news-article bg-white min-h-screen">
         <div className="max-w-[120rem] mx-auto px-6 lg:px-2 py-12">
           {/* Content grid - Moved grid up before header */}
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-16">
+          <div className="grid grid-cols-1 lg:grid-cols-4 ">
             {/* Main content column */}
             <div className="lg:col-span-3">
               {/* Header section */}
