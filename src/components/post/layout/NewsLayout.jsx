@@ -9,7 +9,9 @@ import Breadcrumb from "../../common/Breadcrumb";
 import { formatHeadlineForUrl } from '../../../utils/urlHelpers';
 import { seoConfig } from '../../../utils/seo-config';
 import FactsLayout from "./FactsLayout";
-const NewsLayout = ({ news }) => {
+import RelatedCategoryNews from "./RelatedCategoryNews";
+import LatestNewsSection from './LatestNewsSection';
+const NewsLayout = ({ news, initialRelatedNews = [], latestNews = [] }) => {
   const [categoryNews, setCategoryNews] = useState([]);
   const [isLoadingNews, setIsLoadingNews] = useState(true);
 
@@ -222,14 +224,14 @@ const NewsLayout = ({ news }) => {
       </Head>
 
       <div className="news-article bg-white min-h-screen">
-        <div className="max-w-[120rem] mx-auto px-6 lg:px-12 py-12">
+        <div className="max-w-[120rem] mx-auto px-6 lg:px-2 py-12">
           {/* Content grid - Moved grid up before header */}
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-16">
+          <div className="grid grid-cols-1 lg:grid-cols-4 ">
             {/* Main content column */}
             <div className="lg:col-span-3">
               {/* Header section */}
               <div className="mb-12">
-                <h1 className="text-6xl font-bold text-gray-800 mb-6 text-left leading-tight">
+                <h1 className="text-6xl font-bold text-gray-800 mb-6 text-left leading-tight w-4/5">
                   {news.Headline}
                 </h1>
                 <div className="flex items-start text-gray-600 space-x-6">
@@ -287,10 +289,22 @@ const NewsLayout = ({ news }) => {
                   />
                 </div>
               )}
+
+                <RelatedCategoryNews 
+                  category={news.Category} 
+                  news={initialRelatedNews} 
+                  currentNewsId={news._id} 
+                />
             </div>
           </div>
         </div>
+
+        {/* Latest News Section */}
+        {latestNews && latestNews.length > 0 && (
+          <LatestNewsSection latestNews={latestNews} />
+        )}
       </div>
+
     </>
   );
 };
