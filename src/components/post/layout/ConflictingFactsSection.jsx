@@ -8,27 +8,38 @@ const ConflictingFactsSection = ({ conflictingFacts, expandedTopics, setExpanded
     const isExpanded = expandedTopics[topic] ?? false;
 
     return (
-      <div className="mb-6 last:mb-0">
-        <button
+      <div className="mb-4 last:mb-0 overflow-hidden">
+        <motion.button
           onClick={() => setExpandedTopics(prev => ({ ...prev, [topic]: !prev[topic] }))}
-          className="w-full flex items-center justify-between p-5 bg-gradient-to-r from-amber-600 to-amber-700 rounded-xl mb-4 hover:from-amber-700 hover:to-amber-800 transition-all duration-300 group"
+          className={`w-full flex items-center justify-between p-4 rounded-xl transition-all duration-300
+            ${isExpanded 
+              ? 'bg-amber-500 shadow-lg' 
+              : 'bg-gray-800 hover:bg-gray-750'}`}
+          whileTap={{ scale: 0.995 }}
         >
-          <h3 className="text-xl font-semibold text-white group-hover:text-amber-100 transition-colors">
-            {topic}
-          </h3>
-          <div className={`transform transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}>
-            <FaChevronDown className="text-amber-100 text-lg" />
+          <div className="flex flex-col items-start">
+            <span className={`text-lg font-medium transition-colors
+              ${isExpanded ? 'text-gray-900' : 'text-gray-100'}`}>
+              {topic}
+            </span>
+            <span className={`text-sm mt-1 transition-colors
+              ${isExpanded ? 'text-gray-800' : 'text-gray-400'}`}>
+            </span>
           </div>
-        </button>
+          <div className={`transform transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}>
+            <FaChevronDown className={`text-lg transition-colors
+              ${isExpanded ? 'text-gray-900' : 'text-gray-400'}`} />
+          </div>
+        </motion.button>
 
         <AnimatePresence>
           {isExpanded && (
             <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.3 }}
-              className="space-y-4"
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.2 }}
+              className="mt-3 grid gap-3"
             >
               {conflicts.map((conflict, index) => (
                 <motion.div
@@ -36,16 +47,18 @@ const ConflictingFactsSection = ({ conflictingFacts, expandedTopics, setExpanded
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.1 }}
-                  className="relative p-6 bg-gray-800 rounded-xl border-l-4 border-amber-500 shadow-lg hover:shadow-xl transition-all duration-300"
+                  className="relative"
                 >
-                  <p className="text-lg mb-3 leading-relaxed text-gray-100">
-                    {conflict.claim}
-                  </p>
-                  <div className="flex items-center gap-2 text-base text-gray-400">
-                    <span className="font-medium">Source:</span>
-                    <span className="font-medium text-amber-400">
-                      {conflict.source}
-                    </span>
+                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-amber-500 rounded-full" />
+                  <div className="pl-4 ml-2">
+                    <p className="text-base text-gray-100 leading-relaxed mb-2">
+                      {conflict.claim}
+                    </p>
+                    <div className="inline-flex items-center px-3 py-1 bg-gray-800 rounded-full">
+                      <span className="text-sm text-gray-400">
+                        {conflict.source}
+                      </span>
+                    </div>
                   </div>
                 </motion.div>
               ))}
@@ -57,22 +70,22 @@ const ConflictingFactsSection = ({ conflictingFacts, expandedTopics, setExpanded
   };
 
   return (
-    <section className="bg-gray-900 rounded-2xl p-8 shadow-xl">
-      <div className="flex items-start gap-4 mb-8">
-        <div className="p-3 bg-gradient-to-br from-amber-500 to-amber-700 rounded-xl shadow-lg">
-          <MdWarning className="text-white text-4xl" />
+    <section className="bg-gray-900 rounded-xl p-6">
+      <div className="flex items-center gap-4 mb-8">
+        <div className="p-3 bg-amber-500 rounded-xl">
+          <MdWarning className="text-gray-900 text-2xl" />
         </div>
         <div>
-          <h2 className="text-3xl font-bold text-white mb-2">
+          <h2 className="text-2xl font-semibold text-white">
             Different Perspectives
           </h2>
-          <p className="text-lg text-gray-300">
-            Facts that present alternative viewpoints by topic
+          <p className="text-sm text-gray-400 mt-1">
+            Alternative viewpoints by topic
           </p>
         </div>
       </div>
 
-      <div>
+      <div className="space-y-4">
         {conflictingFacts.map((topicGroup, index) => (
           <TopicSection
             key={index}
