@@ -222,14 +222,14 @@ const NewsLayout = ({ news }) => {
       </Head>
 
       <div className="news-article bg-white min-h-screen">
-        <div className="max-w-[120rem] mx-auto px-6 lg:px-12 py-12">
+        <div className="max-w-[120rem] mx-auto px-6 lg:px-2 py-12">
           {/* Content grid - Moved grid up before header */}
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-16">
             {/* Main content column */}
             <div className="lg:col-span-3">
               {/* Header section */}
               <div className="mb-12">
-                <h1 className="text-6xl font-bold text-gray-800 mb-6 text-left leading-tight">
+                <h1 className="text-6xl font-bold text-gray-800 mb-6 text-left leading-tight w-4/5">
                   {news.Headline}
                 </h1>
                 <div className="flex items-start text-gray-600 space-x-6">
