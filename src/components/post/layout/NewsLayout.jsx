@@ -224,29 +224,26 @@ const NewsLayout = ({ news, initialRelatedNews = [], latestNews = [] }) => {
       </Head>
 
       <div className="news-article bg-white min-h-screen">
-        <div className="max-w-[120rem] mx-auto px-6 lg:px-2 py-12">
-          {/* Content grid - Moved grid up before header */}
-          <div className="grid grid-cols-1 lg:grid-cols-4 ">
-            {/* Main content column */}
+        <div className="max-w-[120rem] mx-auto px-4 lg:px-8 py-8">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
             <div className="lg:col-span-3">
-              {/* Header section */}
-              <div className="mb-12">
-                <h1 className="text-6xl font-bold text-gray-800 mb-6 text-left leading-tight w-4/5">
+              <div className="mb-8">
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-4 text-left leading-tight">
                   {news.Headline}
                 </h1>
-                <div className="flex items-start text-gray-600 space-x-6">
-                  <span className="bg-blue-500 text-white px-6 py-2.5 rounded-full text-lg font-medium inline-block">
+                
+                <div className="flex flex-wrap items-center gap-4 text-gray-600">
+                  <span className="bg-blue-500 text-white px-4 py-1.5 rounded-full text-base font-medium">
                     {news.Category}
                   </span>
-                  <span className="text-lg mt-2">
+                  <span className="text-base">
                     {new Date(news.created_at).toLocaleDateString()}
                   </span>
                 </div>
               </div>
 
-              {/* Rest of the main content */}
-              <div className="mb-12">
-                <div className="w-full lg:w-[88%] relative rounded-lg overflow-hidden">
+              <div className="mb-8">
+                <div className="w-full rounded-lg overflow-hidden">
                   <img
                     src={news.image_url}
                     alt={news.Headline}
@@ -254,27 +251,49 @@ const NewsLayout = ({ news, initialRelatedNews = [], latestNews = [] }) => {
                     loading="eager"
                   />
                 </div>
-                <div className="mt-3 text-base text-gray-500">
+                <div className="mt-2 text-base text-gray-500">
                   Image Credits: {news.Image_source_name}
                 </div>
               </div>
 
               <div className="prose max-w-none">
-                <p className="text-2xl text-gray-700 leading-relaxed text-left mb-12 max-w-[90%]">
+                <p className="text-2xl md:text-3xl text-gray-700 leading-relaxed mb-8 font-normal">
                   {news.Summary}
                 </p>
               </div>
 
-              <hr className="my-16 border-gray-200" />
+              <hr className="my-12 border-gray-200" />
+
+              <div className="lg:hidden mb-8">
+                {(news.similar_facts?.length > 0 || news.conflicting_facts?.length > 0 || !isLoadingNews) && (
+                  <div className="w-full bg-white rounded-lg">
+                    <FactsLayout 
+                      similarFacts={Array.isArray(news.similar_facts) ? news.similar_facts : []}
+                      conflictingFacts={Array.isArray(news.conflicting_facts) ? news.conflicting_facts : []}
+                      news={{
+                        Category: news.Category,
+                        _id: news._id,
+                        categoryNews: categoryNews
+                      }}
+                      isLoading={isLoadingNews}
+                    />
+                  </div>
+                )}
+
+                <RelatedCategoryNews 
+                  category={news.Category} 
+                  news={initialRelatedNews} 
+                  currentNewsId={news._id} 
+                />
+              </div>
               
-              <div className="max-w-[95%]">
+              <div className="max-w-[95%] space-y-8">
                 <SourcesLayout news={news} />
                 <FeedbackLayout newsId={news._id.toString()} />
               </div>
             </div>
 
-            {/* Facts column */}
-            <div className="lg:col-span-1">
+            <div className="hidden lg:block lg:col-span-1">
               {(news.similar_facts?.length > 0 || news.conflicting_facts?.length > 0 || !isLoadingNews) && (
                 <div className="w-full bg-white rounded-lg">
                   <FactsLayout 
@@ -290,21 +309,21 @@ const NewsLayout = ({ news, initialRelatedNews = [], latestNews = [] }) => {
                 </div>
               )}
 
-                <RelatedCategoryNews 
-                  category={news.Category} 
-                  news={initialRelatedNews} 
-                  currentNewsId={news._id} 
-                />
+              <RelatedCategoryNews 
+                category={news.Category} 
+                news={initialRelatedNews} 
+                currentNewsId={news._id} 
+              />
             </div>
           </div>
         </div>
 
-        {/* Latest News Section */}
         {latestNews && latestNews.length > 0 && (
-          <LatestNewsSection latestNews={latestNews} />
+          <div className="mt-12">
+            <LatestNewsSection latestNews={latestNews} />
+          </div>
         )}
       </div>
-
     </>
   );
 };
