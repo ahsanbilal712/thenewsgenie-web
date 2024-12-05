@@ -58,10 +58,12 @@ function MyApp({ Component, pageProps }) {
           content="m2xs2KSR3ynGf6-R3l1pBfQ8lntpPJuQKGH-l5kgcyw"
         />
         <link rel="canonical" href={`https://thenewsgenie.com${pageProps.canonicalPath || ''}`} />
+       
         
         {/* Preload key routes */}
         <link rel="preload" href="/latest" as="fetch" crossOrigin="anonymous" />
         <link rel="preload" href="/api/news" as="fetch" crossOrigin="anonymous" />
+        <link rel="icon" type="image/x-icon" href="/images/newsgenielogo3.png" sizes="64x64"></link>
       </Head>
 
       {/* Custom loading bar styles */}

@@ -13,11 +13,11 @@ const FooterTwo = () => {
 			  	<Link href="/">
                     <a> 
                         <Image 
-                         src="/images/logo-symbol.svg"
+                         src="/images/newsgenielogo3.png"
                          alt="footer logo"
                          className="footer-logo"
-                         width={86}
-                         height={28}
+                         width={200}
+                         height={100}
                         />
                     </a>
                 </Link>

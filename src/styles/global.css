@@ -45,4 +45,8 @@
       transform: rotate(360deg);
     }
   }
+
+  .font-poppins {
+    font-family: 'Poppins', sans-serif;
+  }
   

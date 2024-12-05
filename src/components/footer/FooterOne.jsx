@@ -111,10 +111,10 @@ const FooterOne = () => {
             <Link href="/">
               <a>
                 <Image
-                  src="/images/logo-intellinews.jpeg"
+                  src="/images/newsgenielogo3.png"
                   alt="The News Genie"
-                  width={150}
-                  height={100}
+                  width={300}
+                  height={180}
                 />
               </a>
             </Link>

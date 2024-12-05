@@ -1,4 +1,3 @@
-// src/components/post/NewsLayout.jsx
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Head from "next/head";
@@ -11,6 +10,8 @@ import { seoConfig } from '../../../utils/seo-config';
 import FactsLayout from "./FactsLayout";
 import RelatedCategoryNews from "./RelatedCategoryNews";
 import LatestNewsSection from './LatestNewsSection';
+import FactComparison from './FactComparison'; // Import the new component
+
 const NewsLayout = ({ news, initialRelatedNews = [], latestNews = [] }) => {
   const [categoryNews, setCategoryNews] = useState([]);
   const [isLoadingNews, setIsLoadingNews] = useState(true);
@@ -287,6 +288,8 @@ const NewsLayout = ({ news, initialRelatedNews = [], latestNews = [] }) => {
                 />
               </div>
               
+              <FactComparison news={news} /> {/* Add the FactComparison component here */}
+
               <div className="max-w-[95%] space-y-8">
                 <SourcesLayout news={news} />
                 <FeedbackLayout newsId={news._id.toString()} />

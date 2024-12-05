@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import SocialLink from "../../data/social/SocialLink.json";
 import OffcanvasMenu from "./OffcanvasMenu";
+import SocialLink from "../../data/social/SocialLink.json";
 
 const HeaderTwo = () => {
   const [categories, setCategories] = useState([
@@ -100,54 +100,29 @@ const HeaderTwo = () => {
         <div className="header-top header-top__style-two bg-grey-dark-one">
           <div className="container">
             <div className="row justify-content-between align-items-center">
-              <div className="col-md-4">
-                <ul className="header-top-nav list-inline justify-content-center justify-content-md-start">
-                  <li>
-                    <Link href="/about-us">
-                      <a>About Us</a>
-                    </Link>
-                  </li>
-             
-                  <li>
-                    <Link href="/privacy-policy">
-                      <a>Privacy Policy</a>
-                    </Link>
-                  </li>
-                </ul>
-              </div>
-              <div className="brand-logo-container col-md-4 text-center">
+              <div className="brand-logo-container col-md-4 text-left">
                 <Link href="/">
                   <a>
                     <Image
-                      src="/images/logo-intellinews.jpeg"
+                      src="/images/newsgenielogo3.png"
                       alt="brand-logo"
-                      width={100}
-                      height={75}
+                      width={400}
+                      height={200}
                     />
                   </a>
                 </Link>
               </div>
               <div className="col-md-4">
-                <ul className="ml-auto social-share header-top__social-share justify-content-end">
+                <ul className="header-top-nav list-inline justify-content-center justify-content-md-end">
                   <li>
-                    <a href={SocialLink.fb.url}>
-                      <i className={SocialLink.fb.icon} />
-                    </a>
+                    <Link href="/about-us">
+                      <a>About Us</a>
+                    </Link>
                   </li>
                   <li>
-                    <a href={SocialLink.twitter.url}>
-                      <i className={SocialLink.twitter.icon} />
-                    </a>
-                  </li>
-                  <li>
-                    <a href={SocialLink.instagram.url}>
-                      <i className={SocialLink.instagram.icon} />
-                    </a>
-                  </li>
-                  <li>
-                    <a href={SocialLink.linked.url}>
-                      <i className={SocialLink.linked.icon} />
-                    </a>
+                    <Link href="/privacy-policy">
+                      <a>Privacy Policy</a>
+                    </Link>
                   </li>
                 </ul>
               </div>
