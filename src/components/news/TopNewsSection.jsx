@@ -149,8 +149,14 @@ const TopNewsSection = ({ news }) => {
 
                 <div className="media-body flex flex-col justify-between">
                   <div className="post-cat-group px-4 -mt-20 lg:-mt-[50px] mb-2 flex items-center gap-4">
+                    <Link href={`/news/${formatHeadlineForUrl(newsItem.Headline)}`}>
+                      <a className="post-cat cat-btn bg-color-blue-one text-white px-3">
+                        {newsItem.Category}
+                      </a>
+                    </Link>
                     <div className="flex space-x-3">
-                      {newsItem.sources && newsItem.sources.map((source, index) => (
+                      {newsItem.sources && [...new Map(newsItem.sources.map(source => 
+                        [source.SourceName, source])).values()].map((source, index) => (
                         <div key={index} className="relative group">
                           <img
                             src={imageSources[source.SourceName] || "/images/news-sources/default.png"}
@@ -165,11 +171,6 @@ const TopNewsSection = ({ news }) => {
                         </div>
                       ))}
                     </div>
-                    <Link href={`/news/${formatHeadlineForUrl(newsItem.Headline)}`}>
-                      <a className="post-cat cat-btn bg-color-blue-one text-white px-3">
-                        {newsItem.Category}
-                      </a>
-                    </Link>
                   </div>
                   <div
                     className="text-xl text-white lg:text-5xl hover-line font-bold mt-4 lg:mt-10"
@@ -215,8 +216,14 @@ const TopNewsSection = ({ news }) => {
 
                     <div className="media-body px-4 flex flex-col justify-between">
                       <div className="post-cat-group mb-2 flex items-center gap-4">
+                        <Link href={`/news/${formatHeadlineForUrl(newsItem.Headline)}`}>
+                          <a className="post-cat cat-btn bg-color-blue-one text-white px-3">
+                            {newsItem.Category}
+                          </a>
+                        </Link>
                         <div className="flex space-x-3">
-                          {newsItem.sources && newsItem.sources.map((source, index) => (
+                          {newsItem.sources && [...new Map(newsItem.sources.map(source => 
+                            [source.SourceName, source])).values()].map((source, index) => (
                             <div key={index} className="relative group">
                               <img
                                 src={imageSources[source.SourceName] || "/images/news-sources/default.png"}
@@ -231,11 +238,6 @@ const TopNewsSection = ({ news }) => {
                             </div>
                           ))}
                         </div>
-                        <Link href={`/news/${formatHeadlineForUrl(newsItem.Headline)}`}>
-                          <a className="post-cat cat-btn bg-color-blue-one text-white px-3">
-                            {newsItem.Category}
-                          </a>
-                        </Link>
                       </div>
                       <div
                         className="text-xl lg:text-2xl text-white hover-line font-bold -mt-8 lg:-mt-8"

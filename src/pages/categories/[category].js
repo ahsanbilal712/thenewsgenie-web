@@ -137,7 +137,8 @@ const CategoryPage = ({ initialNews, category, totalCount }) => {
                       </a>
                     </Link>
                     <div className="flex space-x-3">
-                      {item.sources && item.sources.map((source, index) => (
+                      {item.sources && [...new Map(item.sources.map(source => 
+                        [source.SourceName, source])).values()].map((source, index) => (
                         <div key={index} className="relative group">
                           <img
                             src={imageSources[source.SourceName] || "/images/news-sources/default.png"}
