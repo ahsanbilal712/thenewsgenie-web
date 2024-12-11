@@ -2,6 +2,7 @@ import React, { useState, useMemo, useCallback, useEffect } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { FiSearch } from "react-icons/fi";
+import { imageSources } from '../post/layout/imageSources';
 
 // Utility function to format the time ago
 function formatTimeAgo(createdAt) {
@@ -147,10 +148,24 @@ const TopNewsSection = ({ news }) => {
                 </Link>
 
                 <div className="media-body flex flex-col justify-between">
-                  <div className="post-cat-group px-4 -mt-20 lg:-mt-[50px] mb-2">
-                    <Link
-                      href={`/news/${formatHeadlineForUrl(newsItem.Headline)}`}
-                    >
+                  <div className="post-cat-group px-4 -mt-20 lg:-mt-[50px] mb-2 flex items-center gap-4">
+                    <div className="flex space-x-3">
+                      {newsItem.sources && newsItem.sources.map((source, index) => (
+                        <div key={index} className="relative group">
+                          <img
+                            src={imageSources[source.SourceName] || "/images/news-sources/default.png"}
+                            alt={source.SourceName}
+                            className="w-16 h-16 rounded-full border-2 border-white object-cover"
+                          />
+                          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block z-10">
+                            <div className="bg-black text-white text-xs py-1 px-2 rounded whitespace-nowrap">
+                              {source.SourceName}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <Link href={`/news/${formatHeadlineForUrl(newsItem.Headline)}`}>
                       <a className="post-cat cat-btn bg-color-blue-one text-white px-3">
                         {newsItem.Category}
                       </a>
@@ -199,12 +214,24 @@ const TopNewsSection = ({ news }) => {
                     </Link>
 
                     <div className="media-body px-4 flex flex-col justify-between">
-                      <div className="post-cat-group mb-2">
-                        <Link
-                          href={`/news/${formatHeadlineForUrl(
-                            newsItem.Headline
-                          )}`}
-                        >
+                      <div className="post-cat-group mb-2 flex items-center gap-4">
+                        <div className="flex space-x-3">
+                          {newsItem.sources && newsItem.sources.map((source, index) => (
+                            <div key={index} className="relative group">
+                              <img
+                                src={imageSources[source.SourceName] || "/images/news-sources/default.png"}
+                                alt={source.SourceName}
+                                className="w-16 h-16 rounded-full border-2 border-white object-cover"
+                              />
+                              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block z-10">
+                                <div className="bg-black text-white text-xs py-1 px-2 rounded whitespace-nowrap">
+                                  {source.SourceName}
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                        <Link href={`/news/${formatHeadlineForUrl(newsItem.Headline)}`}>
                           <a className="post-cat cat-btn bg-color-blue-one text-white px-3">
                             {newsItem.Category}
                           </a>
