@@ -1,33 +1,7 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaInfoCircle, FaTimes, FaExternalLinkAlt } from "react-icons/fa";
-
-const imageSources = {
-  "ARY News": "/images/news-sources/ARY.png",
-  "Ary News": "/images/news-sources/ARY.png",
-
-  "arynews.tv": "/images/news-sources/ARY.png",
-  'Dawn': "/images/news-sources/dawn.png",
-  "Dawn.com": "/images/news-sources/dawn.png",
-  "thenews.com.pk": "/images/news-sources/thenews.png",
-  "The News": "/images/news-sources/thenews.png",
-  "nation.com.pk": "/images/news-sources/TheNation.png",
-  "The Tribune": "/images/news-sources/express_tribune.jpeg",
-  'Tribune': "/images/news-sources/express_tribune.jpeg",
-  'Tribune.com.pk': "/images/news-sources/express_tribune.jpeg",
-  'tribune.com.pk': "/images/news-sources/express_tribune.jpeg",
-
-  "The Nation": "/images/news-sources/TheNation.png",
-  "Geo TV": "/images/news-sources/geo.png",
-  "Geo News": "/images/news-sources/geo.png",
-  "GEO News": "/images/news-sources/geo.png",
-
-  "geo.tv": "/images/news-sources/geo.png",
-  "GEO TV": "/images/news-sources/geo.png",
-
-
-  "tribune.com.pk": "/images/news-sources/express_tribune.jpeg",
-};
+import { imageSources } from './imageSources';
 
 const SourcesLayout = ({ news }) => {
   const [selectedSource, setSelectedSource] = useState(null);
