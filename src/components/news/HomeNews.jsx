@@ -82,7 +82,7 @@ const HomeNews = ({ news = [] }) => {
                           <img
                             src={imageSources[source.SourceName] || "/images/news-sources/default.png"}
                             alt={source.SourceName}
-                            className="w-16 h-16 rounded-full border-2 border-white object-cover"
+                            className="w-12 h-12 rounded-full border-2 border-white object-cover"
                           />
                           <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block z-10">
                             <div className="bg-black text-white text-xs py-1 px-2 rounded whitespace-nowrap">
