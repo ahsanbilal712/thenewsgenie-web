@@ -7,7 +7,7 @@ import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 import NProgress from 'nprogress';
 import 'nprogress/nprogress.css';
-
+//
 function MyApp({ Component, pageProps }) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
