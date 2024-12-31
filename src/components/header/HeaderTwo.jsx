@@ -104,10 +104,10 @@ const HeaderTwo = () => {
                 <Link href="/">
                   <a>
                     <Image
-                      src="/images/newsgenielogo3.png"
+                      src="/images/logo.png"
                       alt="brand-logo"
-                      width={400}
-                      height={200}
+                      width={150}
+                      height={80}
                     />
                   </a>
                 </Link>

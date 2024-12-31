@@ -244,15 +244,14 @@ const NewsLayout = ({ news, initialRelatedNews = [], latestNews = [] }) => {
               </div>
 
               <div className="mb-8">
-                <div className="w-full rounded-lg overflow-hidden">
+                <div className="relative aspect-[16/9] rounded-xl overflow-hidden">
                   <img
                     src={news.image_url}
                     alt={news.Headline}
-                    className="w-full h-auto object-cover"
-                    loading="eager"
+                    className="w-full h-full object-contain"
                   />
                 </div>
-                <div className="mt-2 text-base text-gray-500">
+                <div className="mt-3 text-sm text-gray-500">
                   Image Credits: {news.Image_source_name}
                 </div>
               </div>
