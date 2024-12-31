@@ -5,6 +5,7 @@ import HeadMeta from "../components/elements/HeadMeta";
 import SectionTitleTwo from "../components/elements/SectionTitleTwo";
 import FooterOne from "../components/footer/FooterOne";
 import HeaderTwo from "../components/header/HeaderTwo";
+import TeamSection from "../components/team/TeamSection";
 
 const AboutUsPage = () => {
   return (
@@ -83,12 +84,12 @@ const AboutUsPage = () => {
 
           <h3>Our Team</h3>
           <p>
-            IntelliNews is powered by a dynamic team of experienced journalists,
-            data scientists, and AI experts. Our team works tirelessly to ensure
+            IntelliNews is powered by a dynamic team of experienced developers, and AI experts. Our team works tirelessly to ensure
             that our content is accurate, engaging, and reflective of the latest
             developments worldwide. We are passionate about news and dedicated
             to keeping our audience informed.
           </p>
+          <TeamSection />
 
           <h3>Why Choose IntelliNews?</h3>
           <p>
@@ -121,8 +122,11 @@ const AboutUsPage = () => {
         </div>
       </div>
       <FooterOne />
+      
     </>
   );
 };
 
 export default AboutUsPage;
+
+
