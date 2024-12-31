@@ -3,6 +3,7 @@ import Link from "next/link";
 import PropTypes from "prop-types";
 import { formatHeadlineForUrl } from '../../utils/urlHelpers';
 import { useRouter } from 'next/router';
+import { imageSources } from '../post/layout/imageSources';
 
 function formatTimeAgo(createdAt) {
   const now = new Date();
@@ -66,7 +67,7 @@ const HomeNews = ({ news = [] }) => {
                   </a>
                 </Link>
                 <div className="media-body lg:mt-0 -mt-16 md:px-10 flex -ml-5 justify-between flex-col">
-                  <div className="post-cat-group ml-3 m-b-xs-10">
+                  <div className="post-cat-group ml-3 m-b-xs-10 flex items-center gap-4">
                     <Link href={`/news/${formatHeadlineForUrl(newsItem.Headline)}`}>
                       <a 
                         className={`post-cat cat-btn bg-color-blue-one`}
@@ -75,6 +76,23 @@ const HomeNews = ({ news = [] }) => {
                         {newsItem.Category}
                       </a>
                     </Link>
+                    <div className="flex space-x-3">
+                      {newsItem.sources && [...new Map(newsItem.sources.map(source => 
+                        [source.SourceName, source])).values()].map((source, index) => (
+                        <div key={index} className="relative group">
+                          <img
+                            src={imageSources[source.SourceName] || "/images/news-sources/default.png"}
+                            alt={source.SourceName}
+                            className="w-16 h-16 rounded-full border-2 border-white object-cover"
+                          />
+                          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block z-10">
+                            <div className="bg-black text-white text-xs py-1 px-2 rounded whitespace-nowrap">
+                              {source.SourceName}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                   <div className="text-3xl md:text-2xl lg:text-3xl xl:text-5xl hover-line md:-mt-4 lg:-mt-8 font-bold"
                     style={{ lineHeight: "1.3" }}>
